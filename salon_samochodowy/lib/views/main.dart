@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
           controller: controller,
           onPageChanged: _onPageChanged,
           children: [
-            const HomeScreen(title: 'BMW'), // Pierwszy ekran
+            const HomeScreen(title: 'BMW'),
             const NewCarsScreen(title: 'nowe samochody'),
             const UsedCarsScreen(title: 'używane samochody'),
           ],
