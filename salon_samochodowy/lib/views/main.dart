@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
+import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/simple_icons.dart';
 import 'screens/home_screen.dart';
 import 'screens/new_cars_screen.dart';
@@ -21,6 +22,10 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'BMW'),
+      routes: {
+        '/new_cars': (context) => const NewCarsScreen(title: 'New Cars'), // Dodana trasa
+        '/usedCars': (context) => UsedCarsScreen(title: 'Used Cars',), // Dodaj tę linię
+      },
     );
   }
 }
@@ -110,11 +115,11 @@ class _MyHomePageState extends State<MyHomePage> {
             label: 'Home Page',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.directions_car_filled_outlined),
+            icon: Iconify(Ph.car_simple_bold),
             label: 'New Cars',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.directions_car_filled_outlined),
+            icon: Iconify(Ph.car_simple_bold),
             label: 'Used Cars',
           ),
         ],
