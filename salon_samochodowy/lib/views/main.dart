@@ -22,6 +22,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'BMW'),
+      debugShowCheckedModeBanner: false,
       routes: {
         '/new_cars': (context) => const NewCarsScreen(title: 'New Cars'), // Dodana trasa
         '/usedCars': (context) => UsedCarsScreen(title: 'Used Cars',), // Dodaj tę linię
@@ -88,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Iconify(
             SimpleIcons.bmw,
             color: Colors.white,
-            size: 36,
+            size: 50,
           ),
           const SizedBox(width: 6),
         ],
