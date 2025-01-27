@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/new_car_widget.dart';
+import '../widgets/used_cars_widget.dart';
+import '../widgets/change_state_widget.dart';
 
 class HomeScreen extends StatelessWidget{
   const HomeScreen({super.key, required String title});
@@ -10,7 +12,9 @@ class HomeScreen extends StatelessWidget{
     body: Column(
       children: [
         const SizedBox(height: 16),
-        NewCarsWidget()
+        NewCarsWidget(),
+        UsedCarsWidget(),
+        ChangeStateWidget(),
       ]
     ),
     );
