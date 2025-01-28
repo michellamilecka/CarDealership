@@ -200,6 +200,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                 ),
                 const SizedBox(height: 16),
 
+
                 // Skrzynia biegów i Moc silnika w jednej linii
                 Row(
                   children: [
