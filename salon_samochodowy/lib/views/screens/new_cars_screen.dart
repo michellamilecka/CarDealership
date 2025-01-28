@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/new_car_widget.dart';
+import '../widgets/footer_widget.dart';
 
 class NewCarsScreen extends StatelessWidget{
   const NewCarsScreen({super.key, required String title});
@@ -31,8 +31,8 @@ class NewCarsScreen extends StatelessWidget{
               ),
             ), )
           ]
-        //  child: NewCarsWidget(), // Wywołanie widgetu NewCarsWidget
       ),
+      bottomNavigationBar: FooterWidget(),
     );
   }
 

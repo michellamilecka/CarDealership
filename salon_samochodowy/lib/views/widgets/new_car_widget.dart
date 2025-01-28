@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:salon_samochodowy/views/screens/new_cars_screen.dart';
@@ -11,7 +10,7 @@ class NewCarsWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(),
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.all(50.0),
+          padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 30.0),
           child: Column(
               children: [
             Container(
@@ -45,6 +44,7 @@ class NewCarsWidget extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(65), // Set the radius here
                     ),
+                        overlayColor: Color(0xFF00A8E8)
                   ),
                   child: Text(
                     'Wyszukaj',
