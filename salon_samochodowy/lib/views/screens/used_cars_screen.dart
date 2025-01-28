@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../widgets/new_car_widget.dart';
 
 class UsedCarsScreen extends StatelessWidget{
   const UsedCarsScreen({super.key, required String title});

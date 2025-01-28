@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
@@ -12,7 +11,7 @@ class ChangeStateWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(),
       child: Center(
         child: Padding(
-          padding: const EdgeInsets.all(45.0),
+          padding: const EdgeInsets.all(30.0),
           child: Column(
               children: [
                 Row(
@@ -63,6 +62,7 @@ class ChangeStateWidget extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(65), // Set the radius here
                         ),
+                          overlayColor: Color(0xFF00A8E8)
                       ),
                       child: Text(
                         'Wyszukaj',
