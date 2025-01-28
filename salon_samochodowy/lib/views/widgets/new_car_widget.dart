@@ -44,6 +44,7 @@ class NewCarsWidget extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(65), // Set the radius here
                     ),
+                        overlayColor: Color(0xFF00A8E8)
                   ),
                   child: Text(
                     'Wyszukaj',

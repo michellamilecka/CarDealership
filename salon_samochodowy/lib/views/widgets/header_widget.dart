@@ -21,7 +21,7 @@ class HeaderWidget extends StatelessWidget {
               const SizedBox(height: 4),
               Container(
                 width: 400,
-                height: 1, // Grubość linii
+                height: 2, // Grubość linii
                 color: Colors.white, // Kolor linii
               ),
             ],
