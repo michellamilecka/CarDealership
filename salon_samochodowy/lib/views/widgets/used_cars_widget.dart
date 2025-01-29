@@ -4,6 +4,8 @@ import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:salon_samochodowy/views/screens/used_cars_screen.dart';
 
+import '../screens/new_cars_screen.dart';
+
 class UsedCarsWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -54,7 +56,7 @@ class UsedCarsWidget extends StatelessWidget {
                   height: 45,
                   child: ElevatedButton(
                       onPressed: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => const UsedCarsScreen(title: 'Used cars')));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const NewCarsScreen(title: 'New cars')));
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xD9D9D9),

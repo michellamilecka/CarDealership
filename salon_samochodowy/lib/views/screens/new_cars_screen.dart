@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../widgets/body_type_dropdown.dart';
 import '../widgets/drive_type_dropdown.dart';
+import '../widgets/engine_power_slider.dart';
 import '../widgets/footer_widget.dart';
 import '../widgets/fuel_type_dropdown.dart';
 import '../widgets/gearbox_type_dropdown.dart';
 import '../widgets/header_widget.dart';
-import '../widgets/new_car_widget.dart';
+import '../widgets/price_slider.dart';
 
 class NewCarsScreen extends StatefulWidget {
   const NewCarsScreen({super.key, required String title});
@@ -152,77 +153,30 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     SizedBox(width: 16),
                     // Moc silnika
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Moc silnika',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Text(
-                            '${enginePower.toStringAsFixed(0)} KM',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          Slider(
-                            min: 0,
-                            max: 1000,
-                            divisions: 100,
-                            label: enginePower.toStringAsFixed(0),
-                            onChanged: (double value) {
-                              setState(() {
-                                enginePower = value;
-                              });
-                            },
-                            value: enginePower,
-                            activeColor: Colors.blue,
-                            inactiveColor: Colors.grey,
-                          ),
-                        ],
+                      child: EnginePowerSlider(
+                        enginePower: enginePower,
+                        onChanged: (double value) {
+                          setState(() {
+                            enginePower = value;
+                          });
+                        },
                       ),
+
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
                 // Cena
-                Text(
-                  'Cena',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  '${price.toStringAsFixed(0)} PLN',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Slider(
-                  min: 0,
-                  max: 2000000,
-                  divisions: 100,
-                  label: price.toStringAsFixed(0),
+                PriceSlider(
+                  price: price,
                   onChanged: (double value) {
                     setState(() {
                       price = value;
                     });
                   },
-                  value: price,
-                  activeColor: Colors.blue,
-                  inactiveColor: Colors.grey,
                 ),
+
               ],
             ),
             const SizedBox(height: 16),
