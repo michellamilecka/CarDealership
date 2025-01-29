@@ -7,7 +7,7 @@ class HeaderWidget extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.black,
-          leading: Navigator.canPop(context) // Sprawdza, czy można cofnąć
+          leading: Navigator.canPop(context)
               ? BackButton(color: Colors.white)
               : null,
           title: Column(
