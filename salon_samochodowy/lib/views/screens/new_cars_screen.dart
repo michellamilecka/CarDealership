@@ -38,7 +38,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            // ExpansionTile for filters
+
             ExpansionTile(
               title: Text(
                 'Filtry',
