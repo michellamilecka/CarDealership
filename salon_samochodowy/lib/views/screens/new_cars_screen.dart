@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import '../widgets/body_type_dropdown.dart';
+import '../widgets/drive_type_dropdown.dart';
+import '../widgets/footer_widget.dart';
+import '../widgets/fuel_type_dropdown.dart';
+import '../widgets/gearbox_type_dropdown.dart';
+import '../widgets/header_widget.dart';
 import '../widgets/new_car_widget.dart';
 
 class NewCarsScreen extends StatefulWidget {
@@ -20,7 +26,10 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Nowe Samochody")),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: HeaderWidget(),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -58,7 +67,11 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                           DropdownButton<String>(
                             isExpanded: true,
                             value: selectedModel,
-                            hint: Text("Wybierz model"),
+                            hint: Text("Wybierz model",
+                                style: TextStyle(
+                                    color: Colors.grey
+                                ),
+                            ),
                             onChanged: (String? newValue) {
                               setState(() {
                                 selectedModel = newValue;
@@ -78,45 +91,13 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     SizedBox(width: 16),
                     // Rodzaj nadwozia
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Rodzaj nadwozia',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedBodyType,
-                            hint: Text("Wybierz nadwozie"),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedBodyType = newValue;
-                              });
-                            },
-                            items: <String>[
-                              'Limuzyna',
-                              'Touring',
-                              'Cabrio',
-                              'Coupé',
-                              'Sports Activity Coupé',
-                              'Sports Activity Vehicle',
-                              'Hatch',
-                              'Tourer',
-                              'BMW i',
-                              'Gran Coupé'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      child: BodyTypeDropdown(
+                        selectedBodyType: selectedBodyType,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedBodyType = newValue;
+                          });
+                        },
                       ),
                     ),
                   ],
@@ -128,72 +109,25 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                   children: [
                     // Rodzaj napędu
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Rodzaj napędu',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedDriveType,
-                            hint: Text("Wybierz napęd"),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedDriveType = newValue;
-                              });
-                            },
-                            items: <String>[
-                              'tylnie koła',
-                              'przednie koła',
-                              'xDrive'
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      child: DriveTypeDropdown(
+                        selectedDriveType: selectedDriveType,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedDriveType = newValue;
+                          });
+                        },
                       ),
                     ),
                     SizedBox(width: 16),
                     // Rodzaj paliwa
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Rodzaj paliwa',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedFuelType,
-                            hint: Text("Wybierz paliwo"),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedFuelType = newValue;
-                              });
-                            },
-                            items: <String>['Diesel', 'Benzyna', 'Plug-in']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      child: FuelTypeDropdown(
+                        selectedFuelType: selectedFuelType,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedFuelType = newValue;
+                          });
+                        },
                       ),
                     ),
                   ],
@@ -205,35 +139,13 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                   children: [
                     // Skrzynia biegów
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Skrzynia biegów',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                          DropdownButton<String>(
-                            isExpanded: true,
-                            value: selectedGearbox,
-                            hint: Text("Wybierz skrzynię biegów"),
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                selectedGearbox = newValue;
-                              });
-                            },
-                            items: <String>['Manual', 'Steptronic', '7-DKG']
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ],
+                      child: GearboxTypeDropdown(
+                        selectedGearbox: selectedGearbox,
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            selectedFuelType = newValue;
+                          });
+                        },
                       ),
                     ),
                     SizedBox(width: 16),
@@ -451,7 +363,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
         ),
 
       ),
-
+      bottomNavigationBar: FooterWidget(),
     );
   }
 }

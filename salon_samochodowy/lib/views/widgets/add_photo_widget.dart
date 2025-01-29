@@ -26,7 +26,7 @@ class _AddPhotoWidgetState extends State<AddPhotoWidget> {
         GestureDetector(
           onTap: _pickImage,
           child: Container(
-            width: 230,
+            width: 190,
             height: 170,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey, width: 2),

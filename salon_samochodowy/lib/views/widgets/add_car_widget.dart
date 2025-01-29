@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:iconify_flutter/iconify_flutter.dart';
 import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
-import 'package:salon_samochodowy/views/screens/change_state_screen.dart';
+import 'package:salon_samochodowy/views/screens/add_car_screen.dart';
 
 class ChangeStateWidget extends StatelessWidget {
   @override
@@ -39,7 +39,7 @@ class ChangeStateWidget extends StatelessWidget {
                   ],
                 ),
                 Text(
-                  'Zmień stan',
+                  'Dodaj samochód',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.black,
