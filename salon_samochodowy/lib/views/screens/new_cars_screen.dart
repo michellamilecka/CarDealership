@@ -7,6 +7,7 @@ import '../widgets/fuel_type_dropdown.dart';
 import '../widgets/gearbox_type_dropdown.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/price_slider.dart';
+import 'information_about_a_car_screen.dart';
 
 class NewCarsScreen extends StatefulWidget {
   const NewCarsScreen({super.key, required String title});
@@ -37,7 +38,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            // ExpansionTile for filters
+
             ExpansionTile(
               title: Text(
                 'Filtry',
@@ -200,6 +201,10 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
             Padding(
               padding: const EdgeInsets.only(top:20.0),
               child: Center(
+                child:GestureDetector(
+                  onTap: (){
+                    Navigator.push(context,MaterialPageRoute(builder: (context)=>InformationAboutACarScreen(title: 'Information')),);
+                  },
                 child: Container(
                   width:350,
                   height:100,
@@ -234,6 +239,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     ],
                   ),
                 ),
+              ),
               ),
             ),
             Padding(
