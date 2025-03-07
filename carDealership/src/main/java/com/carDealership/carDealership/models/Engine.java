@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity
+import java.util.List;
+
+@Entity(name="silniki")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -16,7 +18,7 @@ import lombok.Setter;
 public abstract class Engine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    Integer id;
 
     @Column(name="moc_silnika")
     int power;
@@ -24,4 +26,8 @@ public abstract class Engine {
     @Column(name="rodzaj_paliwa")
     @Enumerated(EnumType.STRING)
     EngineFuelType fuelType;
+
+    @ManyToMany(mappedBy = "engines", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    List<Car> cars;
+
 }

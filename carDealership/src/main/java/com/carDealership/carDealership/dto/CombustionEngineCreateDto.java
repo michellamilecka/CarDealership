@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -15,12 +17,14 @@ public class CombustionEngineCreateDto extends EngineCreateDto {
     double displacement;
     int cylindersNumber;
 
-    public CombustionEngine convertToCombustionEngine(){
+    @Override
+    public CombustionEngine convertToEngine(){
         CombustionEngine combustionEngine = new CombustionEngine();
         combustionEngine.setPower(this.power);
         combustionEngine.setFuelType(EngineFuelType.valueOf(this.fuelType));
         combustionEngine.setDisplacement(this.displacement);
         combustionEngine.setCylindersNumber(this.cylindersNumber);
+        combustionEngine.setCars(new ArrayList<>());
         return combustionEngine;
     }
 }

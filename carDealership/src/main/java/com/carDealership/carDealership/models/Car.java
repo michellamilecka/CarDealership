@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity(name="samochody")
 @NoArgsConstructor
@@ -20,7 +21,7 @@ import java.math.BigDecimal;
 public class Car {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    int id;
+    Integer id;
 
     @Column(name="nazwa")
     String name;
@@ -62,8 +63,10 @@ public class Car {
     @Column(name="zdjecie")
     String imagePath;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="id_silnika", referencedColumnName = "id")
-    Engine engine;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name="samochod_silnik", joinColumns = @JoinColumn(name="car_id"), inverseJoinColumns = @JoinColumn(name="engine_id"))
+    List<Engine> engines;
+
+
 
 }

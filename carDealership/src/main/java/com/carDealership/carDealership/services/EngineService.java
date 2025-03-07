@@ -4,18 +4,22 @@ import com.carDealership.carDealership.dto.*;
 import com.carDealership.carDealership.models.CombustionEngine;
 import com.carDealership.carDealership.models.ElectricEngine;
 import com.carDealership.carDealership.models.Engine;
+import com.carDealership.carDealership.repositories.CarRepository;
 import com.carDealership.carDealership.repositories.EngineRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class EngineService {
     private final EngineRepository engineRepository;
+    private final CarRepository carRepository;
 
-    public EngineService(EngineRepository engineRepository) {
+    public EngineService(EngineRepository engineRepository, CarRepository carRepository) {
         this.engineRepository = engineRepository;
+        this.carRepository = carRepository;
     }
 
     public List<EngineReadDto> getAll() {
@@ -48,17 +52,19 @@ public class EngineService {
 
     public EngineReadDto save(EngineCreateDto engineCreateDto) {
 
-        if(engineCreateDto instanceof ElectricEngineCreateDto)
-        {
-            var result = engineRepository.save(((ElectricEngineCreateDto) engineCreateDto).convertToElectricEngine());
-            return new EngineReadDto(result);
-        }
-        else if (engineCreateDto instanceof CombustionEngineCreateDto)
-        {
-            var result = engineRepository.save(((CombustionEngineCreateDto) engineCreateDto).convertToCombustionEngine());
-            return new EngineReadDto(result);
-        }
+        var result = engineRepository.save(engineCreateDto.convertToEngine());
+        return new EngineReadDto(result);
 
-        throw new IllegalArgumentException();
     }
+
+    public void delete(int idEngine){
+        if(this.engineRepository.existsById(idEngine)){
+            this.engineRepository.deleteById(idEngine);
+            return;
+        } throw new IllegalArgumentException();
+    }
+
+    //TODO update
+
+
 }

@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -15,11 +17,13 @@ import lombok.Setter;
 public class ElectricEngineCreateDto extends EngineCreateDto {
     double capacity;
 
-    public ElectricEngine convertToElectricEngine() {
+    @Override
+    public ElectricEngine convertToEngine() {
         ElectricEngine electricEngine = new ElectricEngine();
         electricEngine.setPower(this.getPower());
         electricEngine.setFuelType(EngineFuelType.valueOf(this.getFuelType()));
         electricEngine.setCapacity(this.getCapacity());
+        electricEngine.setCars(new ArrayList<>());
         return electricEngine;
     }
 }
