@@ -5,6 +5,8 @@ import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:salon_samochodowy/views/screens/information_about_a_car_screen.dart';
 
+import '../screens/information_about_a_client.dart';
+
 class InformationAboutACarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -423,7 +425,31 @@ class InformationAboutACarWidget extends StatelessWidget {
                     ]
                 )
             ),
-
+            const SizedBox(height: 30),
+            SizedBox(
+              width: 150,
+              height: 45,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,MaterialPageRoute(builder: (context)=>InformationAboutAClientScreen(title: 'ClientInformation')),);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xD9D9D9),
+                  overlayColor: Color(0xFF00A8E8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(65),
+                  ),
+                ),
+                child: Text(
+                  'Sprzedaj',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

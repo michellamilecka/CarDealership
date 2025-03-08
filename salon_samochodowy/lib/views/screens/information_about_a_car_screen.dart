@@ -19,7 +19,7 @@ class InformationAboutACarScreen extends StatelessWidget{
             InformationAboutACarWidget(),
           ]
       ),
-      bottomNavigationBar: FooterWidget(),
+
     );
   }
 

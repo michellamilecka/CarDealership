@@ -234,8 +234,6 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                             ),
                           ),
                         ),
-
-
                     ],
                   ),
                 ),
@@ -274,8 +272,6 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                           ),
                         ),
                       ),
-
-
                     ],
                   ),
                 ),
