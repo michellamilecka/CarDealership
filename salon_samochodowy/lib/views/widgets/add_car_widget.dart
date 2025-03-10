@@ -58,7 +58,6 @@ class AddCarWidget extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xD9D9D9),
-
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(65), // Set the radius here
                         ),
