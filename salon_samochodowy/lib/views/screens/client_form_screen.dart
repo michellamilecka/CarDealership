@@ -3,8 +3,8 @@ import '../widgets/header_widget.dart';
 import '../widgets/footer_widget.dart';
 import 'package:email_validator/email_validator.dart' show EmailValidator;
 
-class InformationAboutAClientScreen extends StatelessWidget {
-  const InformationAboutAClientScreen({super.key, required String title});
+class ClientFormScreen extends StatelessWidget {
+  const ClientFormScreen({super.key, required String title});
 
   @override
   Widget build(BuildContext context) {

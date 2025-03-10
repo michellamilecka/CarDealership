@@ -5,7 +5,7 @@ import 'package:iconify_flutter/icons/ph.dart';
 import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:salon_samochodowy/views/screens/information_about_a_car_screen.dart';
 
-import '../screens/information_about_a_client.dart';
+import '../screens/client_form_screen.dart';
 
 class InformationAboutACarWidget extends StatelessWidget {
   @override
@@ -431,7 +431,7 @@ class InformationAboutACarWidget extends StatelessWidget {
               height: 45,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=>InformationAboutAClientScreen(title: 'ClientInformation')),);
+                  Navigator.push(context,MaterialPageRoute(builder: (context)=>ClientFormScreen(title: 'ClientForm')),);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xD9D9D9),
