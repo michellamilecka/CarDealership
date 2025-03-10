@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/footer_widget.dart';
-import 'package:email_validator/email_validator.dart' show EmailValidator;
 
 class ClientFormScreen extends StatelessWidget {
   const ClientFormScreen({super.key, required String title});
