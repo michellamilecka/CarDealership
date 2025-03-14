@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
-@Entity(name="samochody")
+@Entity
+@Table(name="samochody")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -63,9 +65,15 @@ public class Car {
     @Column(name="zdjecie")
     String imagePath;
 
+    @Column(name="numer_vin", unique = true)
+    String vinNumber;
+
+    @Column(name="rok_produkcji")
+    int productionYear;
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name="samochod_silnik", joinColumns = @JoinColumn(name="car_id"), inverseJoinColumns = @JoinColumn(name="engine_id"))
-    List<Engine> engines;
+    List<Engine> engines = new ArrayList<>();
 
 
 

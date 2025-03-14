@@ -1,4 +1,4 @@
-package com.carDealership.carDealership.dto;
+package com.carDealership.carDealership.dto.engine;
 
 import com.carDealership.carDealership.enums.EngineFuelType;
 import com.carDealership.carDealership.models.CombustionEngine;
@@ -13,13 +13,14 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CombustionEngineCreateDto extends EngineCreateDto {
+public class CombustionEngineUpdateDto extends EngineUpdateDto {
     double displacement;
     int cylindersNumber;
 
     @Override
     public CombustionEngine convertToEngine(){
         CombustionEngine combustionEngine = new CombustionEngine();
+        combustionEngine.setId(this.getId());
         combustionEngine.setPower(this.power);
         combustionEngine.setFuelType(EngineFuelType.valueOf(this.fuelType));
         combustionEngine.setDisplacement(this.displacement);

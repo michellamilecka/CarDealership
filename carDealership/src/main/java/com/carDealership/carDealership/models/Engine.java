@@ -9,7 +9,8 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Entity(name="silniki")
+@Entity
+@Table(name="silniki")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

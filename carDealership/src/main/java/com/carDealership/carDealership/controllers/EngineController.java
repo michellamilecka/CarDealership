@@ -1,10 +1,6 @@
 package com.carDealership.carDealership.controllers;
 
-import com.carDealership.carDealership.dto.CombustionEngineReadDto;
-import com.carDealership.carDealership.dto.ElectricEngineReadDto;
-import com.carDealership.carDealership.dto.EngineCreateDto;
-import com.carDealership.carDealership.dto.EngineReadDto;
-import com.carDealership.carDealership.models.Engine;
+import com.carDealership.carDealership.dto.engine.*;
 import com.carDealership.carDealership.services.CarService;
 import com.carDealership.carDealership.services.EngineService;
 import org.springframework.http.HttpStatus;
@@ -50,5 +46,11 @@ public class EngineController {
     public ResponseEntity<Void> deleteEngine(@PathVariable int engineId) {
         engineService.delete(engineId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<EngineReadDto> updateEngine(@RequestBody EngineUpdateDto engineUpdateDto) {
+        EngineReadDto engineReadDto = engineService.updateEngine(engineUpdateDto);
+        return new ResponseEntity<>(engineReadDto, HttpStatus.OK);
     }
 }

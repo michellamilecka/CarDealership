@@ -6,7 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Entity(name="silniki_spalinowe")
+@Entity
+@Table(name="silniki_spalinowe")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter

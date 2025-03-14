@@ -1,4 +1,4 @@
-package com.carDealership.carDealership.dto;
+package com.carDealership.carDealership.dto.engine;
 
 import com.carDealership.carDealership.models.Engine;
 import lombok.AllArgsConstructor;

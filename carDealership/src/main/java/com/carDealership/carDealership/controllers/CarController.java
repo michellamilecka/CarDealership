@@ -1,10 +1,8 @@
 package com.carDealership.carDealership.controllers;
 
-import com.carDealership.carDealership.dto.EngineCreateDto;
-import com.carDealership.carDealership.dto.EngineReadDto;
 import com.carDealership.carDealership.dto.car.CarCreateDto;
 import com.carDealership.carDealership.dto.car.CarReadDto;
-import com.carDealership.carDealership.models.Car;
+import com.carDealership.carDealership.dto.car.CarUpdateDto;
 import com.carDealership.carDealership.services.CarService;
 import com.carDealership.carDealership.services.EngineService;
 import org.springframework.http.HttpStatus;
@@ -45,6 +43,12 @@ public class CarController {
     @PutMapping("/{carId}/add-engine/{engineId}")
     public ResponseEntity<CarReadDto> addEngineToCar(@PathVariable int carId, @PathVariable int engineId) {
         CarReadDto carReadDto = this.carService.addEngineToCar(carId, engineId);
+        return new ResponseEntity<>(carReadDto, HttpStatus.OK);
+    }
+
+    @PutMapping
+    public ResponseEntity<CarReadDto> updateCar(@RequestBody CarUpdateDto carUpdateDto) {
+        CarReadDto carReadDto = this.carService.updateCar(carUpdateDto);
         return new ResponseEntity<>(carReadDto, HttpStatus.OK);
     }
 }

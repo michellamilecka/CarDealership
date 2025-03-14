@@ -17,7 +17,10 @@ import java.util.ArrayList;
 @NoArgsConstructor
 @Getter
 @Setter
-public class CarCreateDto {
+public class CarUpdateDto {
+
+    Integer id;
+
     String name;
 
     String model;
@@ -48,6 +51,7 @@ public class CarCreateDto {
 
     public Car convertToCar() {
         Car car = new Car();
+        car.setId(this.id);
         car.setName(this.name);
         car.setModel(CarModel.valueOf(this.model));
         car.setColor(this.color);

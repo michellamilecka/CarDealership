@@ -1,4 +1,4 @@
-package com.carDealership.carDealership.dto;
+package com.carDealership.carDealership.dto.engine;
 
 import com.carDealership.carDealership.models.Engine;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
@@ -17,11 +17,11 @@ import lombok.Setter;
         include = JsonTypeInfo.As.PROPERTY,
         property = "type") // Klucz w JSON określający typ
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = ElectricEngineCreateDto.class, name = "electric"),
-        @JsonSubTypes.Type(value = CombustionEngineCreateDto.class, name = "combustion")
+        @JsonSubTypes.Type(value = ElectricEngineUpdateDto.class, name = "electric"),
+        @JsonSubTypes.Type(value = CombustionEngineUpdateDto.class, name = "combustion")
 })
-public abstract class EngineCreateDto {
-
+public abstract class EngineUpdateDto {
+    Integer id;
     int power;
     String fuelType;
 

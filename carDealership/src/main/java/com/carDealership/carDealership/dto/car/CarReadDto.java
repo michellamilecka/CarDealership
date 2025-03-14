@@ -1,22 +1,14 @@
 package com.carDealership.carDealership.dto.car;
 
-import com.carDealership.carDealership.dto.EngineReadDto;
-import com.carDealership.carDealership.enums.CarBodyType;
-import com.carDealership.carDealership.enums.CarDrivetrainType;
-import com.carDealership.carDealership.enums.CarModel;
-import com.carDealership.carDealership.enums.CarTransmission;
+import com.carDealership.carDealership.dto.engine.EngineReadDto;
 import com.carDealership.carDealership.models.Car;
-import com.carDealership.carDealership.models.Engine;
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -50,6 +42,10 @@ public class CarReadDto {
 
     String imagePath;
 
+    String vinNumber;
+
+    int productionYear;
+
     List<EngineReadDto> engines;
 
     public CarReadDto(Car car) {
@@ -66,6 +62,8 @@ public class CarReadDto {
         this.bodyType = car.getBodyType().toString();
         this.price = car.getPrice();
         this.imagePath = car.getImagePath();
+        this.vinNumber = car.getVinNumber();
+        this.productionYear = car.getProductionYear();
         this.engines = car.getEngines()
                 .stream()
                 .map(EngineReadDto::new)

@@ -1,8 +1,7 @@
-package com.carDealership.carDealership.dto;
+package com.carDealership.carDealership.dto.engine;
 
 import com.carDealership.carDealership.enums.EngineFuelType;
 import com.carDealership.carDealership.models.ElectricEngine;
-import com.carDealership.carDealership.models.Engine;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
