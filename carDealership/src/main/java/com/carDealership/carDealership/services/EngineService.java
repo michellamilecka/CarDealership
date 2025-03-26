@@ -70,14 +70,13 @@ public class EngineService {
         } throw new IllegalArgumentException();
     }
 
-    //TODO update
     @Transactional
     public EngineReadDto updateEngine(EngineUpdateDto engineUpdateDto) {
         try{
             Engine updatedEngine = this.entityManager.merge(engineUpdateDto.convertToEngine());
             return new EngineReadDto(updatedEngine);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
     }
 

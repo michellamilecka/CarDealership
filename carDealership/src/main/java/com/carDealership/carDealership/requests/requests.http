@@ -91,3 +91,94 @@ Content-Type: application/json
     "productionYear": 1999
 }
 
+### Wypisujemy wszystkich klientów
+GET http://localhost:8080/api/clients
+Accept: application/json
+
+### Wypisujemy wszystkich klientów prywatnych
+GET http://localhost:8080/api/clients/individual
+Accept: application/json
+
+### Wypisujemy wszystkich klientów firmowych
+GET http://localhost:8080/api/clients/corporate
+Accept: application/json
+
+### Dodajemy nowego klienta indywidualnego
+POST http://localhost:8080/api/clients
+Content-Type: application/json
+
+{
+  "type": "individual",
+  "name": "John",
+  "surname": "Doe",
+  "pesel": "12345678901",
+  "address": "123 Main Street, New York",
+  "phoneNumber": "+1 123 456 789",
+  "email": "john.doe@example.com"
+}
+
+### Dodajemy nowego klienta firmowego
+POST http://localhost:8080/api/clients
+Content-Type: application/json
+
+{
+  "type": "corporate",
+  "companyName": "Tech Solutions LLC",
+  "nip": "1234567890",
+  "address": "456 Business Avenue, Chicago",
+  "phoneNumber": "+1 987 654 321",
+  "email": "contact@techsolutions.com"
+}
+
+### Updateujemy klienta firmowego
+PUT http://localhost:8080/api/clients
+Content-Type: application/json
+
+{
+  "id": 2,
+  "type": "corporate",
+  "companyName": "OpenIA",
+  "nip": "1234567890",
+  "address": "456 Business Avenue, Chicago",
+  "phoneNumber": "+1 989 654 321",
+  "email": "contact@techsolutions.com"
+}
+
+### Usuwamy klienta po ID
+DELETE http://localhost:8080/api/clients/1
+Accept: application/json
+
+### Wypisujemy wszystkie transakcje
+GET http://localhost:8080/api/transactions
+Accept: application/json
+
+### Dodajemy transakcję
+POST http://localhost:8080/api/transactions
+Content-Type: application/json
+
+{
+  "totalAmount": 35000.00,
+  "paymentMethod": "cos",
+  "registered": true,
+  "insured": false,
+  "clientId": 2,
+  "carId": 1
+}
+
+### Usuwamy transakcję po ID
+DELETE http://localhost:8080/api/transactions/5
+Accept: application/json
+
+### Update'ujemy transakcję
+PUT http://localhost:8080/api/transactions
+Content-Type: application/json
+
+{
+  "id": 4,
+  "totalAmount": 999000.00,
+  "paymentMethod": "cos",
+  "registered": true,
+  "insured": false,
+  "clientId": 2,
+  "carId": 1
+}

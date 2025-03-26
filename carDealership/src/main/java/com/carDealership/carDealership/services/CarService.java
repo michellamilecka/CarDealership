@@ -53,6 +53,7 @@ public class CarService {
         Engine engine = this.engineRepository.findById(idEngine).orElseThrow();
 
         car.getEngines().add(engine);
+        carRepository.save(car);
 
         return new CarReadDto(car);
     }

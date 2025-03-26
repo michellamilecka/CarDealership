@@ -74,7 +74,4 @@ public class Car {
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name="samochod_silnik", joinColumns = @JoinColumn(name="car_id"), inverseJoinColumns = @JoinColumn(name="engine_id"))
     List<Engine> engines = new ArrayList<>();
-
-
-
 }
