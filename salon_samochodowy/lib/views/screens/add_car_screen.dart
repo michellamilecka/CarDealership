@@ -37,7 +37,7 @@ class _ChangeStateScreenState extends State<ChangeStateScreen> {
   double selectedTopSpeed=123.1;//trzeba dorobic miejsce do wpisania
   double selectedGasMileage=111;//trzeba dorobic miejsce do wpisania
   String selectedImagePath="naraziebyleco.jpg";
-  String selectedVin="nwm";//trzeba dorobic miejsce do wpisania
+  String selectedVin="nwm1";//trzeba dorobic miejsce do wpisania
   int selectedProductionYear=2004;//trzeba dorobic miejsce do wpisania
 
   Future<void> sendCarData() async {
@@ -59,7 +59,7 @@ class _ChangeStateScreenState extends State<ChangeStateScreen> {
       'bodyType':'wow',//musi bbyc tak bo enumy sie nie zgadzaja
       'price':selectedPrice,
       'imagePath':selectedImagePath,
-      'vinNumber':selectedVin,
+      'vinNumber':selectedColor,//potem zmienic na selectedVin
       'productionYear':selectedProductionYear,
     };
 

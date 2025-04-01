@@ -6,9 +6,12 @@ import 'package:iconify_flutter/icons/mdi.dart';
 import 'package:salon_samochodowy/views/screens/information_about_a_car_screen.dart';
 import 'package:salon_samochodowy/views/screens/list_of_clients_and_sales_screen.dart';
 import '../screens/client_form_screen.dart';
-
+import '../classes/car.dart';
 
 class InformationAboutACarWidget extends StatefulWidget {
+  final Car car;
+
+  const InformationAboutACarWidget({super.key, required this.car});
   @override
   _InformationAboutACarWidgetState createState() => _InformationAboutACarWidgetState();
 }
@@ -16,16 +19,46 @@ class InformationAboutACarWidget extends StatefulWidget {
 class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget> {
   bool _isEditing = false;
 
-  TextEditingController _priceController = TextEditingController(text: '247 955 PLN');
-  TextEditingController _colorController = TextEditingController(text: 'Storm Bay metalizowany');
-  TextEditingController _modelController = TextEditingController(text: 'BMW iX3');
-  TextEditingController _bodyTypeController = TextEditingController(text: 'SUV');
-  TextEditingController _driveTypeController = TextEditingController(text: 'na tylne koła');
-  TextEditingController _fuelTypeController = TextEditingController(text: 'samochód elektryczny');
-  TextEditingController _transmissionController = TextEditingController(text: 'jednobiegowa przekładnia');
-  TextEditingController _powerController = TextEditingController(text: '286 KM');
-  TextEditingController _descriptionController = TextEditingController(text: 'BMW iX3 otwiera nową erę radości z jazdy bez emisji spalin. Odkryj pierwsze w pełni elektryczne BMW Sport Activity Vehicle, które łączy w sobie to, co najlepsze z dwóch światów: dynamikę jazdy i najwyższą jakość BMW X3 ze zwiększonymi osiągami i wydajnością technologii BMW eDrive piątej generacji. Dzięki zasięgowi do 460 km* i zużyciu energii od 18,5 kWh/100 km* BMW iX3 wyznacza nowe standardy. A inteligentne produkty i dostosowanym do potrzeb usługi BMW Charging sprawiają, że ładowanie jest łatwiejsze, szybsze i wydajniejsze niż kiedykolwiek dotąd. W pełni dopracowane, w pełni elektryczne: BMW iX3 już dzisiaj demonstruje elektryzującą przyszłość.');
+  late TextEditingController _priceController ;
+  late TextEditingController _nameController ;
+  late TextEditingController _colorController ;
+  late TextEditingController _modelController ;
+  late TextEditingController _bodyTypeController ;
+  late TextEditingController _driveTypeController ;
+  //late TextEditingController _fuelTypeController ;
+  late TextEditingController _transmissionController ;
+  //late TextEditingController _powerController ;
+  late TextEditingController _descriptionController ;
+  late TextEditingController _accelerationController ;
+  late TextEditingController _topSpeedController ;
+  late TextEditingController _gasMileageController ;
+  late TextEditingController _vinNumberController ;
+  late TextEditingController _productionYearController ;
+  @override
+  void initState() {
+    super.initState();
+    _priceController = TextEditingController(text: '${widget.car.price} PLN');
+    _colorController = TextEditingController(text: '${widget.car.color}');
+    _modelController = TextEditingController(text: '${widget.car.model}');
+    _bodyTypeController = TextEditingController(text: '${widget.car.bodyType}');
+    _driveTypeController = TextEditingController(text: '${widget.car.drivetrainType}');
+    //_fuelTypeController = TextEditingController(text: '${widget.car.}');
+    _transmissionController = TextEditingController(text: '${widget.car.transmission}');
+    //_powerController = TextEditingController(text: '${widget.car.power}');
+    _descriptionController = TextEditingController(text: '${widget.car.description}');
+    _nameController = TextEditingController(text: '${widget.car.name}');
+    _accelerationController = TextEditingController(text: '${widget.car.acceleration} s');
+    _topSpeedController = TextEditingController(text: '${widget.car.topSpeed} km/h');
+    _gasMileageController = TextEditingController(text: '${widget.car.gasMileage} l');
+    _vinNumberController = TextEditingController(text: '${widget.car.vinNumber}');
+    _productionYearController = TextEditingController(text: '${widget.car.productionYear}');
+  }
 
+  @override
+  void dispose() {
+    _priceController.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -37,10 +70,24 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                if(!_isEditing)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => ListOfClientsAndSalesScreen(title: 'ListOfClientsAndSales')),
+                    );
+                  },
+                  child: Icon(
+                    Icons.monetization_on, // Ikona sprzedaży
+                    size: 20,
+                    color: Colors.blue,
+                  ),
+                ),
                 Padding(
-                  padding: const EdgeInsets.only(right:15.0),
+                  padding: const EdgeInsets.only(right:15.0,left:15.0),
                   child: Text(
-                    'BMW iX3',
+                    _nameController.text,
                     style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -60,7 +107,10 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                     size: 20,
                     color: Colors.blue,
                   ),
+
                 ),
+                 // Odstęp między ikonami
+
               ],
             ),
             Padding(
@@ -74,7 +124,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                     child:ClipRRect(
                       borderRadius: BorderRadius.circular(20.0),
                       child: Image.asset(
-                        'assets/auto1.png',
+                        'assets/star.png',
                         height: 170.0,
                         width: 230.0,
                         fit: BoxFit.cover,
@@ -164,7 +214,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                         Padding(
                                           padding: const EdgeInsets.only(left:15.0),
                                           child: Text(
-                                              'Cena',
+                                              'Nazwa',
                                               style:TextStyle(
                                                   fontSize:15.0,
                                                   fontWeight: FontWeight.bold,
@@ -178,7 +228,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                               ? SizedBox(
                                             width: 150,
                                             child: TextField(
-                                              controller: _priceController,
+                                              controller: _nameController,
                                               style: TextStyle(fontSize: 15.0),
                                               decoration: InputDecoration(
                                                 border: InputBorder.none,
@@ -187,54 +237,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                             ),
                                           )
                                               : Text(
-                                            _priceController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Kolor lakieru',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _colorController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _colorController.text,
+                                            _nameController.text,
                                             style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
                                         ),
@@ -282,6 +285,53 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                           )
                                               : Text(
                                             _modelController.text,
+                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                        ),
+
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0),
+                              child: Container(
+                                  width:350,
+                                  height:50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:15.0),
+                                          child: Text(
+                                              'Cena',
+                                              style:TextStyle(
+                                                  fontSize:15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Colors.black
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 15.0),
+                                          child: _isEditing
+                                              ? SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              controller: _priceController,
+                                              style: TextStyle(fontSize: 15.0),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            _priceController.text,
                                             style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
                                         ),
@@ -399,7 +449,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                         Padding(
                                           padding: const EdgeInsets.only(left:15.0),
                                           child: Text(
-                                              'Rodzaj paliwa',
+                                              'Przyspieszenie',
                                               style:TextStyle(
                                                   fontSize:15.0,
                                                   fontWeight: FontWeight.bold,
@@ -413,7 +463,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                               ? SizedBox(
                                             width: 150,
                                             child: TextField(
-                                              controller: _fuelTypeController,
+                                              controller: _accelerationController,
                                               style: TextStyle(fontSize: 15.0),
                                               decoration: InputDecoration(
                                                 border: InputBorder.none,
@@ -422,7 +472,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                             ),
                                           )
                                               : Text(
-                                            _fuelTypeController.text,
+                                            _accelerationController.text,
                                             style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
                                         ),
@@ -493,7 +543,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                         Padding(
                                           padding: const EdgeInsets.only(left:15.0),
                                           child: Text(
-                                              'Moc silnika',
+                                              'Kolor',
                                               style:TextStyle(
                                                   fontSize:15.0,
                                                   fontWeight: FontWeight.bold,
@@ -507,7 +557,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                               ? SizedBox(
                                             width: 150,
                                             child: TextField(
-                                              controller: _powerController,
+                                              controller: _colorController,
                                               style: TextStyle(fontSize: 15.0),
                                               decoration: InputDecoration(
                                                 border: InputBorder.none,
@@ -516,7 +566,195 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                             ),
                                           )
                                               : Text(
-                                            _powerController.text,
+                                            _colorController.text,
+                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                        ),
+
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0),
+                              child: Container(
+                                  width:350,
+                                  height:50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:15.0),
+                                          child: Text(
+                                              'Predkosc maksymalna',
+                                              style:TextStyle(
+                                                  fontSize:15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Colors.black
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 15.0),
+                                          child: _isEditing
+                                              ? SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              controller: _topSpeedController,
+                                              style: TextStyle(fontSize: 15.0),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            _topSpeedController.text,
+                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                        ),
+
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0),
+                              child: Container(
+                                  width:350,
+                                  height:50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:15.0),
+                                          child: Text(
+                                              'Zużycie paliwa',
+                                              style:TextStyle(
+                                                  fontSize:15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Colors.black
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 15.0),
+                                          child: _isEditing
+                                              ? SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              controller: _gasMileageController,
+                                              style: TextStyle(fontSize: 15.0),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            _gasMileageController.text,
+                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                        ),
+
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0),
+                              child: Container(
+                                  width:350,
+                                  height:50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:15.0),
+                                          child: Text(
+                                              'Numer VIN',
+                                              style:TextStyle(
+                                                  fontSize:15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Colors.black
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 15.0),
+                                          child: _isEditing
+                                              ? SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              controller: _vinNumberController,
+                                              style: TextStyle(fontSize: 15.0),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            _vinNumberController.text,
+                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                        ),
+
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0),
+                              child: Container(
+                                  width:350,
+                                  height:50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:15.0),
+                                          child: Text(
+                                              'Rok produkcji',
+                                              style:TextStyle(
+                                                  fontSize:15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Colors.black
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 15.0),
+                                          child: _isEditing
+                                              ? SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              controller: _productionYearController,
+                                              style: TextStyle(fontSize: 15.0),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            _productionYearController.text,
                                             style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
                                         ),
@@ -530,31 +768,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                     ]
                 )
             ),
-            const SizedBox(height: 30),
-            SizedBox(
-              width: 150,
-              height: 45,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,MaterialPageRoute(builder: (context)=>ListOfClientsAndSalesScreen(title: 'ListOfClientsAndSales')),);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xD9D9D9),
-                  overlayColor: Color(0xFF00A8E8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(65),
-                  ),
-                ),
-                child: Text(
-                  'Sprzedaj',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-              ),
-            ),
+
           ],
         ),
       ),

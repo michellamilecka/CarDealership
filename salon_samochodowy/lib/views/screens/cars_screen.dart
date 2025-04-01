@@ -8,6 +8,10 @@ import '../widgets/gearbox_type_dropdown.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/price_slider.dart';
 import 'information_about_a_car_screen.dart';
+import '../classes/car.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class NewCarsScreen extends StatefulWidget {
   const NewCarsScreen({super.key, required String title});
@@ -25,6 +29,24 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
   double enginePower = 0;
   double price = 0;
 
+  Future<List<Car>> fetchCars() async {
+    final response = await http.get(Uri.parse('http://10.0.2.2:8080/api/cars'));
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      return data.map((carJson) => Car.fromJson(carJson)).toList();
+    } else {
+      throw Exception('Failed to load cars');
+    }
+  }
+
+  late Future<List<Car>> carsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    carsFuture=fetchCars();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +60,6 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-
             ExpansionTile(
               title: Text(
                 'Filtry',
@@ -68,10 +89,9 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                           DropdownButton<String>(
                             isExpanded: true,
                             value: selectedModel,
-                            hint: Text("Wybierz model",
-                                style: TextStyle(
-                                    color: Colors.grey
-                                ),
+                            hint: Text(
+                              "Wybierz model",
+                              style: TextStyle(color: Colors.grey),
                             ),
                             onChanged: (String? newValue) {
                               setState(() {
@@ -137,7 +157,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                         selectedGearbox: selectedGearbox,
                         onChanged: (String? newValue) {
                           setState(() {
-                            selectedFuelType = newValue;
+                            selectedGearbox = newValue;
                           });
                         },
                       ),
@@ -152,7 +172,6 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                           });
                         },
                       ),
-
                     ),
                   ],
                 ),
@@ -170,10 +189,9 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton(
-                onPressed: () {
-                },
+                onPressed: () {},
                 style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.grey,
+                  backgroundColor: Colors.grey,
                 ),
                 child: Text(
                   'Wyszukaj',
@@ -185,121 +203,73 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(top:20.0),
-              child: Center(
-                child:GestureDetector(
-                  onTap: (){
-                    Navigator.push(context,MaterialPageRoute(builder: (context)=>InformationAboutACarScreen(title: 'Information')),);
-                  },
-                child: Container(
-                  width:350,
-                  height:100,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left:10.0,right:100.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                        child:Image.asset('assets/auto1.png',
-                            height:70,
-                          fit: BoxFit.cover,),
-                      ),
-                      ),
-                         Padding(
-                          padding: const EdgeInsets.only(left:5.0),
-                          child: Text(
-                            'BMW iX3',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
+            const SizedBox(height: 20),
+            FutureBuilder<List<Car>>(
+              future: carsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('Brak danych samochodów.'));
+                } else {
+                  List<Car> cars = snapshot.data!;
+                  return Column(
+                    children: cars.map((car) {
+                      return Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    InformationAboutACarScreen(car:car),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 380,
+                            height: 100,
+                            decoration: BoxDecoration(
+                              color: Color(0xFFD9D9D9),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10.0, right: 80.0),
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: Image.asset(
+                                      'assets/star.png',  // Zmieniono na asset1.png
+                                      height: 70,
+                                      width:100,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 2.0),
+                                  child: Text(
+                                    car.name,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                    ],
-                  ),
-                ),
-              ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top:20.0),
-              child: Center(
-                child: Container(
-                  width:350,
-                  height:100,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left:10.0,right:100.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child:Image.asset('assets/auto2.png',
-                            height:70,
-                            fit: BoxFit.cover,),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left:5.0),
-                        child: Text(
-                          'BMW X1',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top:20.0),
-              child: Center(
-                child: Container(
-                  width:350,
-                  height:100,
-                  decoration: BoxDecoration(
-                    color: Color(0xFFD9D9D9),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left:10.0,right:100.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child:Image.asset('assets/auto3.png',
-                            height:70,
-                            fit: BoxFit.cover,),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(left:5.0),
-                        child: Text(
-                          'BMW X6',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
             ),
           ],
         ),

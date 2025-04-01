@@ -59,4 +59,27 @@ class Car {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'model': model,
+      'color': color,
+      'acceleration': acceleration,
+      'transmission': transmission,
+      'topSpeed': topSpeed,
+      'gasMileage': gasMileage,
+      'drivetrainType': drivetrainType,
+      'description': description,
+      'bodyType': bodyType,
+      'price': price,
+      'imagePath': imagePath,
+      'vinNumber': vinNumber,
+      'productionYear': productionYear,
+    };
+  }
+
 }
+
+
