@@ -44,15 +44,19 @@ class _ChangeStateScreenState extends State<ChangeStateScreen> {
     final url = Uri.parse('http://10.0.2.2:8080/api/cars');
     final Map<String, dynamic> carData = {
       'name':selectedName,
-      'model':selectedModel,
+      //'model':selectedModel,
+      'model':'wow',//musi byc taki bo enumy sie nie zgadzaja
       'color':selectedColor,
       'acceleration':selectedAcceleration,
-      'transmission':selectedGearbox,
+      //'transmission':selectedGearbox,
+      'transmission':'wow',//musi tak byc bo enumy sie nie zgadzaja
       'topSpeed':selectedTopSpeed,
       'gasMileage':selectedGasMileage,
-      'drivetrainType':selectedDriveType,
+      //'drivetrainType':selectedDriveType,
+      'drivetrainType':'wow',//musi tak byc bo enumy sie nie zgadzaja
       'description':selectedDescription,
-      'bodyType':selectedBodyType,
+      //'bodyType':selectedBodyType,
+      'bodyType':'wow',//musi bbyc tak bo enumy sie nie zgadzaja
       'price':selectedPrice,
       'imagePath':selectedImagePath,
       'vinNumber':selectedVin,
