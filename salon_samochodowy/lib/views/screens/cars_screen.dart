@@ -223,11 +223,12 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                           onTap: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    InformationAboutACarScreen(car:car),
-                              ),
-                            );
+                              MaterialPageRoute(builder: (context) => InformationAboutACarScreen(car: car)),
+                            ).then((_) {
+                              setState(() {
+                                carsFuture = fetchCars();
+                              });
+                            });
                           },
                           child: Container(
                             width: 380,

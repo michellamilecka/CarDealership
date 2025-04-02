@@ -7,6 +7,15 @@ import 'package:salon_samochodowy/views/screens/information_about_a_car_screen.d
 import 'package:salon_samochodowy/views/screens/list_of_clients_and_sales_screen.dart';
 import '../screens/client_form_screen.dart';
 import '../classes/car.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+double _parseDouble(String value, double defaultValue) {
+  value = value.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.').trim();
+  return double.tryParse(value) ?? defaultValue;
+}
+
+
 
 class InformationAboutACarWidget extends StatefulWidget {
   final Car car;
@@ -18,6 +27,41 @@ class InformationAboutACarWidget extends StatefulWidget {
 
 class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget> {
   bool _isEditing = false;
+
+  Future<void> updateCar() async {
+    final url = Uri.parse('http://10.0.2.2:8080/api/cars');
+
+    Map<String, dynamic> updatedCar = {
+      "id": widget.car.id,
+      "name": _nameController.text,
+      "model": _modelController.text,
+      "color": _colorController.text,
+      "acceleration": _parseDouble(_accelerationController.text, widget.car.acceleration),
+      "transmission": _transmissionController.text,
+      "topSpeed": _parseDouble(_topSpeedController.text, widget.car.topSpeed),
+      "gasMileage": _parseDouble(_gasMileageController.text, widget.car.gasMileage),
+      "drivetrainType": _driveTypeController.text,
+      "description": _descriptionController.text,
+      "bodyType": _bodyTypeController.text,
+      "price": _parseDouble(_priceController.text, widget.car.price),
+      "imagePath": "zobaczymy",
+      "vinNumber": _vinNumberController.text,
+      "productionYear": int.tryParse(_productionYearController.text) ?? 1999,
+    };
+
+    final response = await http.put(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode(updatedCar),
+    );
+
+    if (response.statusCode == 200) {
+      print(" Samochód został zaktualizowany!");
+    } else {
+      print("Błąd aktualizacji: ${response.statusCode}");
+      print("Odpowiedź serwera: ${response.body}");
+    }
+  }
 
   late TextEditingController _priceController ;
   late TextEditingController _nameController ;
@@ -98,6 +142,9 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                 ),
                 GestureDetector(
                   onTap: () {
+                    if (_isEditing) {
+                      updateCar();
+                    }
                     setState(() {
                       _isEditing = !_isEditing;
                     });
@@ -107,7 +154,6 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                     size: 20,
                     color: Colors.blue,
                   ),
-
                 ),
                  // Odstęp między ikonami
 
