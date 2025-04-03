@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/cars")
@@ -26,6 +27,11 @@ public class CarController {
     @GetMapping
     public ResponseEntity<List<CarReadDto>> getAllCars() {
         return new ResponseEntity<>(carService.getAllCars(), HttpStatus.OK);
+    }
+
+    @GetMapping("/filters")
+    public ResponseEntity<List<CarReadDto>> getAllFilteredCars(@RequestParam Map<String, String> filters) {
+        return new ResponseEntity<>(carService.getAllFilteredCars(filters), HttpStatus.OK);
     }
 
     @PostMapping

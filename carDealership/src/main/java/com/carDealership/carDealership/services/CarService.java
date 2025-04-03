@@ -7,12 +7,16 @@ import com.carDealership.carDealership.models.Car;
 import com.carDealership.carDealership.models.Engine;
 import com.carDealership.carDealership.repositories.CarRepository;
 import com.carDealership.carDealership.repositories.EngineRepository;
+import com.carDealership.carDealership.specifications.CarSpecifications;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,7 +33,17 @@ public class CarService {
     }
 
     public List<CarReadDto> getAllCars() {
-        return this.carRepository.findAll()
+        return this.carRepository.findAllByOrderByIdAsc()
+                .stream()
+                .map(CarReadDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<CarReadDto> getAllFilteredCars(Map<String, String> filters) {
+        Specification<Car> spec = CarSpecifications.carModelWithFilters(filters);
+        List<Car> result = carRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "id"));
+
+        return result
                 .stream()
                 .map(CarReadDto::new)
                 .collect(Collectors.toList());

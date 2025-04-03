@@ -30,7 +30,7 @@ public class EngineService {
 
     public List<EngineReadDto> getAll() {
         return this.engineRepository
-                .findAll()
+                .findAllByOrderByIdAsc()
                 .stream()
                 .map(EngineReadDto::new)
                 .collect(Collectors.toList());
@@ -38,7 +38,7 @@ public class EngineService {
 
     public List<ElectricEngineReadDto> getAllElectric(){
         return this.engineRepository
-                .findAll()
+                .findAllByOrderByIdAsc()
                 .stream()
                 .filter(engine -> engine instanceof ElectricEngine)
                 .map(engine -> (ElectricEngine)engine)
@@ -48,7 +48,7 @@ public class EngineService {
 
     public List<CombustionEngineReadDto> getAllCombustion(){
         return this.engineRepository
-                .findAll()
+                .findAllByOrderByIdAsc()
                 .stream()
                 .filter(engine -> engine instanceof CombustionEngine)
                 .map(engine -> (CombustionEngine)engine)

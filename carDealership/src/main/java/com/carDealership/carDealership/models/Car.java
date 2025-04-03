@@ -1,9 +1,6 @@
 package com.carDealership.carDealership.models;
 
-import com.carDealership.carDealership.enums.CarBodyType;
-import com.carDealership.carDealership.enums.CarDrivetrainType;
-import com.carDealership.carDealership.enums.CarModel;
-import com.carDealership.carDealership.enums.CarTransmission;
+import com.carDealership.carDealership.enums.*;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -74,4 +71,12 @@ public class Car {
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name="samochod_silnik", joinColumns = @JoinColumn(name="car_id"), inverseJoinColumns = @JoinColumn(name="engine_id"))
     List<Engine> engines = new ArrayList<>();
+
+    @Column(name="przebieg_km")
+    int mileage;
+
+    @Column(name="stan")
+    @Enumerated(EnumType.STRING)
+    CarCondition condition;
+
 }

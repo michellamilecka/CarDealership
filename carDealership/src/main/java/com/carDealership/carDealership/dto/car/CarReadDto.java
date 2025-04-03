@@ -48,6 +48,10 @@ public class CarReadDto {
 
     List<EngineReadDto> engines;
 
+    int mileage;
+
+    String condition;
+
     public CarReadDto(Car car) {
         this.id = car.getId();
         this.name = car.getName();
@@ -64,6 +68,8 @@ public class CarReadDto {
         this.imagePath = car.getImagePath();
         this.vinNumber = car.getVinNumber();
         this.productionYear = car.getProductionYear();
+        this.mileage = car.getMileage();
+        this.condition = car.getCondition().toString();
         this.engines = car.getEngines()
                 .stream()
                 .map(EngineReadDto::new)
