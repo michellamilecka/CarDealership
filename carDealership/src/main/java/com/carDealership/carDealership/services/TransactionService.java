@@ -34,7 +34,11 @@ public class TransactionService {
     }
 
     public List<TransactionReadDto> getAll() {
-        return this.transactionRepository.findAll().stream().map(TransactionReadDto::new).collect(Collectors.toList());
+        return this.transactionRepository
+                .findAllByOrderByIdAsc()
+                .stream()
+                .map(TransactionReadDto::new)
+                .collect(Collectors.toList());
     }
 
     @Transactional

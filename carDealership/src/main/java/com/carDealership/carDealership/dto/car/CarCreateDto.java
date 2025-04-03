@@ -1,9 +1,6 @@
 package com.carDealership.carDealership.dto.car;
 
-import com.carDealership.carDealership.enums.CarBodyType;
-import com.carDealership.carDealership.enums.CarDrivetrainType;
-import com.carDealership.carDealership.enums.CarModel;
-import com.carDealership.carDealership.enums.CarTransmission;
+import com.carDealership.carDealership.enums.*;
 import com.carDealership.carDealership.models.Car;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -46,6 +43,10 @@ public class CarCreateDto {
 
     int productionYear;
 
+    int mileage;
+
+    String condition;
+
     public Car convertToCar() {
         Car car = new Car();
         car.setName(this.name);
@@ -62,6 +63,8 @@ public class CarCreateDto {
         car.setImagePath(this.imagePath);
         car.setVinNumber(this.vinNumber);
         car.setProductionYear(this.productionYear);
+        car.setMileage(this.mileage);
+        car.setCondition(CarCondition.valueOf(this.condition));
         car.setEngines(new ArrayList<>());
         return car;
     }

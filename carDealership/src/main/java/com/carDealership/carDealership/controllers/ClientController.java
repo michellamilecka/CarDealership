@@ -49,6 +49,4 @@ public class ClientController {
         ClientReadDto clientReadDto = clientService.updateClient(clientUpdateDto);
         return new ResponseEntity<>(clientReadDto, HttpStatus.OK);
     }
-
-
 }

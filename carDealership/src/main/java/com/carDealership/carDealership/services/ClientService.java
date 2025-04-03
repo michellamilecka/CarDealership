@@ -25,7 +25,7 @@ public class ClientService {
     }
     public List<ClientReadDto> getAll() {
         return this.clientRepository
-                .findAll()
+                .findAllByOrderByIdAsc()
                 .stream()
                 .map(ClientReadDto::new)
                 .collect(Collectors.toList());
@@ -33,7 +33,7 @@ public class ClientService {
 
     public List<IndividualClientReadDto> getAllIndividual() {
         return this.clientRepository
-                .findAll()
+                .findAllByOrderByIdAsc()
                 .stream()
                 .filter(client -> client instanceof IndividualClient)
                 .map(client -> (IndividualClient)client)
@@ -43,7 +43,7 @@ public class ClientService {
 
     public List<CorporateClientReadDto> getAllCorporate() {
         return this.clientRepository
-                .findAll()
+                .findAllByOrderByIdAsc()
                 .stream()
                 .filter(client -> client instanceof CorporateClient)
                 .map(client -> (CorporateClient)client)

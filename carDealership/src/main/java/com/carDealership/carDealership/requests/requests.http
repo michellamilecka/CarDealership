@@ -41,26 +41,80 @@ Accept: application/json
 GET http://localhost:8080/api/cars
 Accept: application/json
 
+### Wypisujemy wszystkie samochody z jakimis tam wybranymi filtrami
+GET http://localhost:8080/api/cars/filters?bodyType=wow&maxprice=60000
+Accept: application/json
+
 ### Dodajemy nowy samochod
 POST http://localhost:8080/api/cars
 Content-Type: application/json
 
 {
-    "name": "Tesla Model S",
-    "model": "wow",
-    "color": "Red",
-    "acceleration": 3.1,
-    "transmission": "wow",
-    "topSpeed": 250.5,
-    "gasMileage": 0.0,
-    "drivetrainType": "wow",
-    "description": "Luxury electric sedan with high performance.",
-    "bodyType": "wow",
-    "price": 79999.99,
-    "imagePath": "/images/tesla-model-s.jpg",
-    "vinNumber": "dncdn",
-    "productionYear": 1999
+  "name": "Tesla Model S",
+  "model": "wow",
+  "color": "Red",
+  "acceleration": 3.1,
+  "transmission": "wow",
+  "topSpeed": 250.5,
+  "gasMileage": 0.0,
+  "mileage": 15000,
+  "drivetrainType": "wow",
+  "description": "Luxury electric sedan with high performance.",
+  "bodyType": "wow",
+  "price": 79999.99,
+  "imagePath": "/images/tesla-model-s.jpg",
+  "vinNumber": "mskowiedja",
+  "productionYear": 1999,
+  "condition": "używany"
 }
+
+
+### Dodajemy nowy samochod
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "BMW M3",
+  "model": "wow",
+  "color": "Blue",
+  "acceleration": 3.9,
+  "transmission": "wow",
+  "topSpeed": 290.0,
+  "gasMileage": 10.2,
+  "mileage": 15333,
+  "drivetrainType": "wow",
+  "description": "High-performance sports sedan with a twin-turbo engine.",
+  "bodyType": "wow",
+  "price": 69999.99,
+  "imagePath": "/images/bmw-m3.jpg",
+  "vinNumber": "bmw12345m3",
+  "productionYear": 2023,
+  "condition": "używany"
+}
+
+### Dodajemy nowy samochod
+POST http://localhost:8080/api/cars
+Content-Type: application/json
+
+{
+  "name": "Ford Mustang GT",
+  "model": "wow",
+  "color": "Yellow",
+  "acceleration": 4.2,
+  "transmission": "wow",
+  "topSpeed": 250.0,
+  "gasMileage": 12.5,
+  "mileage": 0,
+  "drivetrainType": "wow",
+  "description": "Iconic American muscle car with a roaring V8 engine.",
+  "bodyType": "wow",
+  "price": 55999.99,
+  "imagePath": "/images/ford-mustang-gt.jpg",
+  "vinNumber": "mustang550gt",
+  "productionYear": 2022,
+  "condition": "nowy"
+}
+
 
 ### Usuwamy samochod po ID
 DELETE http://localhost:8080/api/cars/1
@@ -74,22 +128,25 @@ PUT http://localhost:8080/api/cars
 Content-Type: application/json
 
 {
-    "id": 2,
-    "name": "Tesla Model S",
-    "model": "wow",
-    "color": "Pink",
-    "acceleration": 3.1,
-    "transmission": "wow",
-    "topSpeed": 250.5,
-    "gasMileage": 0.0,
-    "drivetrainType": "wow",
-    "description": "Luxury electric sedan with high performance.",
-    "bodyType": "wow",
-    "price": 79999.99,
-    "imagePath": "/images/tesla-model-s.jpg",
-    "vinNumber": "dncdn",
-    "productionYear": 1999
+  "id": 7,
+  "name": "Tesla Model S",
+"model": "wow",
+"color": "Black",
+"acceleration": 3.1,
+"transmission": "wow",
+"topSpeed": 250.5,
+"gasMileage": 0.0,
+"mileage": 15000,
+"drivetrainType": "wow",
+"description": "Luxury electric sedan with high performance.",
+"bodyType": "wow",
+"price": 79999.99,
+"imagePath": "/images/tesla-model-s.jpg",
+"vinNumber": "mskowiedja",
+"productionYear": 1999,
+"condition": "używany"
 }
+
 
 ### Wypisujemy wszystkich klientów
 GET http://localhost:8080/api/clients
