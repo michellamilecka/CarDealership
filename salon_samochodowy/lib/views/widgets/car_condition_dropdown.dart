@@ -33,8 +33,8 @@ class CarConditionDropdown extends StatelessWidget {
           ), // Tekst podpowiedzi
           onChanged: onChanged, // Callback, który zostanie wywołany przy zmianie wartości
           items: <String>[
-            'Nowy', // Opcje stanu samochodu
-            'Używany',
+            'nowy', // Opcje stanu samochodu
+            'używany',
           ].map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,

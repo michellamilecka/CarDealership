@@ -15,12 +15,14 @@ class AccelerationSlider extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Przyspieszenie',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+        Center(
+          child: Text(
+            'Przyspieszenie',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
           ),
         ),
         // Zmiana, by pokazywało wartości z przecinkiem (np. 2.5 s)

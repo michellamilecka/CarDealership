@@ -5,7 +5,7 @@ import '../widgets/engine_power_slider.dart';
 import '../widgets/acceleration_slider.dart';
 import '../widgets/footer_widget.dart';
 import '../widgets/fuel_type_dropdown.dart';
-import '../widgets/production_year_slider.dart';
+import '../widgets/production_year_dropdown.dart';
 import '../widgets/gearbox_type_dropdown.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/price_slider.dart';
@@ -37,20 +37,57 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
   double acceleration=0;
   double topSpeed=0;
   double gasMileage=0;
-  int productionYear = 1980;
+  int? selectedProductionYear ;
   double mileage=0;
   String? selectedCondition;
+  void resetFilters() {
+    setState(() {
+      selectedModel = null;
+      selectedBodyType = null;
+      selectedDriveType = null;
+      selectedFuelType = null;
+      selectedGearbox = null;
+      selectedCondition = null;
+      selectedProductionYear = null;
+      enginePower = 0;
+      price = 0;
+      acceleration = 0;
+      topSpeed = 0;
+      gasMileage = 0;
+      mileage = 0;
+      carsFuture = fetchCars();
+    });
+  }
+
   Future<List<Car>> filterCars() async {
     List<Car> allCars = await fetchCars();
-    return allCars.where((car) {
-      final matchesPrice = car.price <= price;
-      final matchesCondition = car.condition=='nowy';
-      final matchesAcceleration=car.acceleration<=acceleration;
-      final matchesTopSpeed=car.topSpeed<=topSpeed;
 
-      return matchesPrice && matchesCondition && matchesAcceleration && matchesTopSpeed;
+    return allCars.where((car) {
+      //final matchesModel=car.model==selectedModel; na razie zakomentowane przez eunumy w bazie
+      //final matchesCarBodyType=car.bodyType==selectedBodyType;na razie zakomentowane przez eunumy w bazie
+      //final matchesCarDrivetrainType=car.drivetrainType==selectedDriveType; na razie zakomentowane przez eunumy w bazie
+      //final matchesFuelType nie zrobiony silnik jeszcze
+      //final matchesCarTransmission=car.transmission==selectedGearbox;na razie zakomentowane przez eunumy w bazie
+      final matchesCondition = selectedCondition != null ? car.condition == selectedCondition : true;
+      final matchesYearProduction = selectedProductionYear != null ? car.productionYear == selectedProductionYear : true;
+      final matchesAcceleration = acceleration > 0 ? car.acceleration <= acceleration : true;
+      final matchesTopSpeed = topSpeed > 0 ? car.topSpeed <= topSpeed : true;
+      final matchesGasMileage = gasMileage > 0 ? car.gasMileage <= gasMileage : true;
+      final matchesMileage = mileage > 0.0 ? car.mileage <= mileage : true;
+      final matchesPrice = price > 0 ? car.price <= price : true;
+
+
+
+      return matchesPrice &&
+          matchesCondition &&
+          matchesAcceleration &&
+          matchesTopSpeed &&
+          matchesMileage &&
+          matchesGasMileage &&
+          matchesYearProduction;
     }).toList();
   }
+
 
   Future<List<Car>> fetchCars() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/api/cars'));
@@ -86,14 +123,25 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
           children: [
             const SizedBox(height: 16),
             ExpansionTile(
-              title: Text(
-                'Filtry',
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Filtry',
+                    style: TextStyle(
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.clear, color: Colors.black),
+                    tooltip: 'Wyczyść filtry',
+                    onPressed: resetFilters,
+                  ),
+                ],
               ),
+
               children: [
                 const SizedBox(height: 16),
                 Row(
@@ -201,6 +249,21 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  alignment: Alignment.centerLeft,
+                  child: ProductionYearDropdown(
+                    selectedYear: selectedProductionYear,
+                    onChanged: (int newYear) {
+                      setState(() {
+                        selectedProductionYear = newYear;
+                      });
+                    },
+                    years: availableYears,
+                  ),
+                ),
+
+                const SizedBox(height: 16),
                 PriceSlider(
                   price: price,
                   onChanged: (double value) {
@@ -209,6 +272,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     });
                   },
                 ),
+                const SizedBox(height: 16),
                 AccelerationSlider(acceleration: acceleration,
                   onChanged: (double value) {
                     setState(() {
@@ -216,6 +280,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     });
                   },
                 ),
+                const SizedBox(height: 16),
                 TopspeedSlider(topSpeed: topSpeed,
                   onChanged: (double value) {
                     setState(() {
@@ -223,6 +288,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     });
                   },
                 ),
+                const SizedBox(height: 16),
                 GasmileageSlider(gasMileage: gasMileage,
                   onChanged: (double value) {
                     setState(() {
@@ -230,6 +296,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     });
                   },
                 ),
+                const SizedBox(height: 16),
                 MileageSlider(mileage: mileage,
                   onChanged: (double value) {
                     setState(() {
@@ -237,40 +304,31 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     });
                   },
                 ),
-                ProductionYearDropdown(
-                  selectedYear: productionYear,
-                  onChanged: (int newYear) {
-                    setState(() {
-                      productionYear = newYear;
-                    });
-                  },
-                  years: availableYears, // Lista dostępnych lat
-                ),
+
 
               ],
             ),
             const SizedBox(height: 16),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    carsFuture = filterCars();
-                  });
-                },
-
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey,
-                ),
-                child: Text(
-                  'Wyszukaj',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () {
+                    setState(() {
+                      carsFuture = filterCars();
+                    });
+                  },
+                  icon: Icon(Icons.search, color: Colors.black),
+                  label: Text(
+                    'Wyszukaj',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
                   ),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.grey),
                 ),
-              ),
+
+              ],
             ),
+
             const SizedBox(height: 20),
             FutureBuilder<List<Car>>(
               future: carsFuture,
@@ -294,7 +352,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                               MaterialPageRoute(builder: (context) => InformationAboutACarScreen(car: car)),
                             ).then((_) {
                               setState(() {
-                                carsFuture = fetchCars();
+                                carsFuture = filterCars();
                               });
                             });
                           },
@@ -312,7 +370,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(20),
                                     child: Image.asset(
-                                      'assets/star.png',  // Zmieniono na asset1.png
+                                      'assets/star.png',
                                       height: 70,
                                       width:100,
                                       fit: BoxFit.cover,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ProductionYearDropdown extends StatelessWidget {
-  final int selectedYear;
+  final int? selectedYear;
   final ValueChanged<int> onChanged;
   final List<int> years;
 
@@ -25,9 +25,8 @@ class ProductionYearDropdown extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        // Kontener z określoną szerokością
         Container(
-          width: 200, // Możesz dostosować szerokość do własnych potrzeb
+          width: 200,
           child: DropdownButton<int>(
             value: selectedYear,
             onChanged: (int? newYear) {
@@ -41,11 +40,11 @@ class ProductionYearDropdown extends StatelessWidget {
                 child: Text(year.toString()),
               );
             }).toList(),
-            isExpanded: false, // Ustawienie na false, aby dropdown nie zajmował pełnej szerokości
             hint: Text("Wybierz rok"),
-            isDense: true, // Mniejsza wysokość pozycji
-            dropdownColor: Colors.white, // Możesz ustawić kolor tła rozwijanego menu
-            itemHeight: 48, // Wysokość pojedynczej pozycji w rozwijanym menu
+            isExpanded: true,
+            isDense: true,
+            dropdownColor: Colors.white,
+            itemHeight: 48,
           ),
         ),
       ],
