@@ -2,11 +2,17 @@ import 'package:flutter/material.dart';
 import '../widgets/body_type_dropdown.dart';
 import '../widgets/drive_type_dropdown.dart';
 import '../widgets/engine_power_slider.dart';
+import '../widgets/acceleration_slider.dart';
 import '../widgets/footer_widget.dart';
 import '../widgets/fuel_type_dropdown.dart';
+import '../widgets/production_year_slider.dart';
 import '../widgets/gearbox_type_dropdown.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/price_slider.dart';
+import '../widgets/mileage_slider.dart';
+import '../widgets/gasmileage_slider.dart';
+import '../widgets/topspeed_slider.dart';
+import '../widgets/car_condition_dropdown.dart';
 import 'information_about_a_car_screen.dart';
 import '../classes/car.dart';
 import 'package:http/http.dart' as http;
@@ -28,6 +34,23 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
   String? selectedGearbox;
   double enginePower = 0;
   double price = 0;
+  double acceleration=0;
+  double topSpeed=0;
+  double gasMileage=0;
+  int productionYear = 1980;
+  double mileage=0;
+  String? selectedCondition;
+  Future<List<Car>> filterCars() async {
+    List<Car> allCars = await fetchCars();
+    return allCars.where((car) {
+      final matchesPrice = car.price <= price;
+      final matchesCondition = car.condition=='nowy';
+      final matchesAcceleration=car.acceleration<=acceleration;
+      final matchesTopSpeed=car.topSpeed<=topSpeed;
+
+      return matchesPrice && matchesCondition && matchesAcceleration && matchesTopSpeed;
+    }).toList();
+  }
 
   Future<List<Car>> fetchCars() async {
     final response = await http.get(Uri.parse('http://10.0.2.2:8080/api/cars'));
@@ -49,6 +72,8 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    List<int> availableYears = List<int>.generate(2025 - 1980 + 1, (index) => 1980 + index);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
@@ -164,11 +189,11 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     ),
                     SizedBox(width: 16),
                     Expanded(
-                      child: EnginePowerSlider(
-                        enginePower: enginePower,
-                        onChanged: (double value) {
+                      child: CarConditionDropdown(
+                        selectedCondition: selectedCondition,
+                        onChanged: (String? newValue) {
                           setState(() {
-                            enginePower = value;
+                            selectedCondition = newValue;
                           });
                         },
                       ),
@@ -184,12 +209,55 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                     });
                   },
                 ),
+                AccelerationSlider(acceleration: acceleration,
+                  onChanged: (double value) {
+                    setState(() {
+                      acceleration = value;
+                    });
+                  },
+                ),
+                TopspeedSlider(topSpeed: topSpeed,
+                  onChanged: (double value) {
+                    setState(() {
+                      topSpeed = value;
+                    });
+                  },
+                ),
+                GasmileageSlider(gasMileage: gasMileage,
+                  onChanged: (double value) {
+                    setState(() {
+                      gasMileage = value;
+                    });
+                  },
+                ),
+                MileageSlider(mileage: mileage,
+                  onChanged: (double value) {
+                    setState(() {
+                      mileage = value;
+                    });
+                  },
+                ),
+                ProductionYearDropdown(
+                  selectedYear: productionYear,
+                  onChanged: (int newYear) {
+                    setState(() {
+                      productionYear = newYear;
+                    });
+                  },
+                  years: availableYears, // Lista dostępnych lat
+                ),
+
               ],
             ),
             const SizedBox(height: 16),
             Center(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  setState(() {
+                    carsFuture = filterCars();
+                  });
+                },
+
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey,
                 ),

@@ -9,6 +9,7 @@ class Car {
   final String transmission;
   final double topSpeed;
   final double gasMileage;
+  final int mileage;
   final String drivetrainType;
   final String description;
   final String bodyType;
@@ -16,6 +17,7 @@ class Car {
   final String imagePath;
   final String vinNumber;
   final int productionYear;
+  final String condition;
   final List<Engine> engines;
 
   Car({
@@ -27,6 +29,7 @@ class Car {
     required this.transmission,
     required this.topSpeed,
     required this.gasMileage,
+    required this.mileage,
     required this.drivetrainType,
     required this.description,
     required this.bodyType,
@@ -34,6 +37,7 @@ class Car {
     required this.imagePath,
     required this.vinNumber,
     required this.productionYear,
+    required this.condition,
     required this.engines,
   });
 
@@ -47,6 +51,7 @@ class Car {
       transmission: json['transmission'],
       topSpeed: json['topSpeed'],
       gasMileage: json['gasMileage'],
+      mileage: json['mileage'],
       drivetrainType: json['drivetrainType'],
       description: json['description'],
       bodyType: json['bodyType'],
@@ -54,6 +59,7 @@ class Car {
       imagePath: json['imagePath'],
       vinNumber: json['vinNumber'],
       productionYear: json['productionYear'],
+      condition: json['condition'],
       engines: (json['engines'] as List)
           .map((engine) => Engine.fromJson(engine))
           .toList(),
@@ -70,6 +76,7 @@ class Car {
       'transmission': transmission,
       'topSpeed': topSpeed,
       'gasMileage': gasMileage,
+      'mileage':mileage,
       'drivetrainType': drivetrainType,
       'description': description,
       'bodyType': bodyType,
@@ -77,6 +84,7 @@ class Car {
       'imagePath': imagePath,
       'vinNumber': vinNumber,
       'productionYear': productionYear,
+      'condition':condition,
     };
   }
 

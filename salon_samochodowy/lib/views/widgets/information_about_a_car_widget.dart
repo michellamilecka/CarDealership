@@ -14,6 +14,10 @@ double _parseDouble(String value, double defaultValue) {
   value = value.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.').trim();
   return double.tryParse(value) ?? defaultValue;
 }
+int _parseInt(String value, int defaultValue) {
+  value = value.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.').trim();
+  return int.tryParse(value) ?? defaultValue;
+}
 
 
 
@@ -40,6 +44,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
       "transmission": _transmissionController.text,
       "topSpeed": _parseDouble(_topSpeedController.text, widget.car.topSpeed),
       "gasMileage": _parseDouble(_gasMileageController.text, widget.car.gasMileage),
+      'mileage':_parseInt(_mileageController.text,widget.car.mileage),
       "drivetrainType": _driveTypeController.text,
       "description": _descriptionController.text,
       "bodyType": _bodyTypeController.text,
@@ -47,6 +52,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
       "imagePath": "zobaczymy",
       "vinNumber": _vinNumberController.text,
       "productionYear": int.tryParse(_productionYearController.text) ?? 1999,
+      "condition":_conditionController.text,
     };
 
     final response = await http.put(
@@ -76,8 +82,10 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
   late TextEditingController _accelerationController ;
   late TextEditingController _topSpeedController ;
   late TextEditingController _gasMileageController ;
+  late TextEditingController _mileageController;
   late TextEditingController _vinNumberController ;
   late TextEditingController _productionYearController ;
+  late TextEditingController _conditionController;
   @override
   void initState() {
     super.initState();
@@ -94,8 +102,10 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
     _accelerationController = TextEditingController(text: '${widget.car.acceleration} s');
     _topSpeedController = TextEditingController(text: '${widget.car.topSpeed} km/h');
     _gasMileageController = TextEditingController(text: '${widget.car.gasMileage} l');
+    _mileageController=TextEditingController(text: '${widget.car.gasMileage} km');
     _vinNumberController = TextEditingController(text: '${widget.car.vinNumber}');
     _productionYearController = TextEditingController(text: '${widget.car.productionYear}');
+    _conditionController=TextEditingController(text:'${widget.car.condition}');
   }
 
   @override
@@ -683,6 +693,53 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                         Padding(
                                           padding: const EdgeInsets.only(left:15.0),
                                           child: Text(
+                                              'Przebieg',
+                                              style:TextStyle(
+                                                  fontSize:15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Colors.black
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 15.0),
+                                          child: _isEditing
+                                              ? SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              controller: _mileageController,
+                                              style: TextStyle(fontSize: 15.0),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            _mileageController.text,
+                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
+                                          ),
+                                        ),
+
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0),
+                              child: Container(
+                                  width:350,
+                                  height:50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:15.0),
+                                          child: Text(
                                               'Zużycie paliwa',
                                               style:TextStyle(
                                                   fontSize:15.0,
@@ -803,6 +860,57 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                                             _productionYearController.text,
                                             style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
                                           ),
+                                        ),
+
+                                      ]
+                                  )
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top:20.0),
+                              child: Container(
+                                  width:350,
+                                  height:50,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  child:Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children:[
+                                        Padding(
+                                          padding: const EdgeInsets.only(left:15.0),
+                                          child: Text(
+                                              'Stan',
+                                              style:TextStyle(
+                                                  fontSize:15.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color:Colors.black
+                                              )
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(right: 15.0),
+                                          child: _isEditing
+                                              ? SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              controller: _conditionController,
+                                              style: TextStyle(fontSize: 15.0),
+                                              decoration: InputDecoration(
+                                                border: InputBorder.none,
+                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                                              ),
+                                            ),
+                                          )
+                                              : Text(
+                                            _conditionController.text != 'nowy' ? 'używany' : _conditionController.text,
+                                            style: TextStyle(
+                                              fontSize: 15.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          )
                                         ),
 
                                       ]
