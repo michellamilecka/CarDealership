@@ -714,7 +714,7 @@
     "drivetrainType": "na wszystkie koła",
     "cylindersNumber": "4",
     "displacement": "1 998",
-    "acceleration": "6 5",
+    "acceleration": "6",
     "topSpeed": "250",
     "model": "330i"
   },
@@ -1121,7 +1121,7 @@
     "drivetrainType": "na wszystkie koła",
     "cylindersNumber": "4",
     "displacement": "1 998",
-    "acceleration": "6 5",
+    "acceleration": "6",
     "topSpeed": "250",
     "model": "318d Touring"
   },

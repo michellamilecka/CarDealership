@@ -6,8 +6,10 @@ import com.carDealership.carDealership.dto.car.CarUpdateDto;
 import com.carDealership.carDealership.services.CarService;
 import com.carDealership.carDealership.services.EngineService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +36,9 @@ public class CarController {
         return new ResponseEntity<>(carService.getAllFilteredCars(filters), HttpStatus.OK);
     }
 
-    @PostMapping
-    public ResponseEntity<CarReadDto> createCar(@RequestBody CarCreateDto carCreateDto) {
-        CarReadDto carReadDto = carService.save(carCreateDto);
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CarReadDto> createCar(@RequestPart("car") CarCreateDto carCreateDto, @RequestPart("image") MultipartFile imageFile) {
+        CarReadDto carReadDto = carService.save(carCreateDto, imageFile);
         return new ResponseEntity<>(carReadDto, HttpStatus.CREATED);
     }
 

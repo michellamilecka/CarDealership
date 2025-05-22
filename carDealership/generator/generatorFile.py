@@ -1,13 +1,17 @@
+import re
 from faker import Faker
 from random import randint, choice
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 import json
 import random
-
+from copy import deepcopy
+import os
 
 output_klienci = "carDealership/generator/clients.json"
 output_samochody = "carDealership/generator/cars.json"
 output_transakcje = "carDealership/generator/transactions.json"
+output_enumy = "carDealership/generator/enums.json"
 scraper_output = "carDealership/scraper/scraperResult.json"
 
 
@@ -46,7 +50,7 @@ opisy_samochodow = {
 
 stan_samochodu = { "nowy", "używany" }
 
-dane_samochodow = {
+dane_samochodu = {
     "name",
     "model",
     "color",
@@ -104,9 +108,8 @@ def filtrowanie_samochodow(sciezka_do_pliku):
     elektryczne = [obj for obj in data if obj.get("fuelType") == "elektryczny"]
     hybrydowe = [obj for obj in data if obj.get("fuelType") == "hybrydowy"]
     
-    return elektryczne, spalinowe, hybrydowe
+    return elektryczne + spalinowe + hybrydowe
 
-elektryczne, spalinowe, hybrydowe = filtrowanie_samochodow(scraper_output)
 
 def generowanie_samochodu(samochod):
 
@@ -123,81 +126,162 @@ def generowanie_samochodu(samochod):
     samochod["vinNumber"] = fake.unique.vin()
     samochod["productionYear"] = random.randint(2020, 2025)
     samochod["condition"] = random.choice(list(stan_samochodu))
-    
+
     if samochod["condition"] == "nowy":
         samochod["mileage"] = 0
     else:
         samochod["mileage"] = random.randint(0, 40000)
+
+
+    match = re.search(r'\((\d+)\)', samochod["power"])
+    if "capacity" in samochod:
+        samochod["capacity"] = float(samochod["capacity"].replace(",", ".").strip())
+
+    if "displacement" in samochod:
+        samochod["displacement"] = int(samochod["displacement"].replace(" ", "").strip())
+
+    acceleration_match = re.search(r'\d+,\d+', samochod["acceleration"])
+    if acceleration_match:
+        samochod["acceleration"] = float(acceleration_match.group(0).replace(',', '.'))
+    else:
+        samochod["acceleration"] = float(samochod["acceleration"].replace(",", ".").strip())
+
     
-           
 
 
-#     @Column(name="zuzycie_paliwa")
-#     double gasMileage;
+    if match:
+        samochod["power"] = int(match.group(1))
+    
+    silniki = filtrowanie_silnika(samochod)
+    
+    samochod = {k: v for k, v in samochod.items() if k in dane_samochodu}
 
-#     @Column(name="opis")
-#     String description;
-#  
-#     @Column(name="numer_vin", unique = true)
-#     String vinNumber;
+    samochod["engines"] = silniki
 
-#     @Column(name="rok_produkcji")
-#     int productionYear;
+    return samochod
 
-#     @Column(name="przebieg_km")
-#     int mileage;
 
-#     @Column(name="stan")
-#     @Enumerated(EnumType.STRING)
-#     CarCondition condition;
-# transakcje 
-# public class Transaction {
+def filtrowanie_silnika(samochod):
 
-#     @Column(name="data_transakcji")
-#     LocalDateTime transactionDate;
+    silniki = []
 
-#     @Column(name="kwota")
-#     BigDecimal totalAmount;
+    if samochod["fuelType"] == "elektryczny":
+        silnik = {
+            "type": "electric",
+            "power": samochod["power"],
+            "fuelType": samochod["fuelType"],
+            "capacity": samochod["capacity"]
+        }
+        silniki.append(silnik)
+    elif samochod["fuelType"] in ("benzyna", "diesel"):
+        silnik = {
+            "type": "combustion",
+            "power": samochod["power"],
+            "fuelType": samochod["fuelType"],
+            "displacement": samochod["displacement"],
+            "cylindersNumber": samochod["cylindersNumber"]
+        }
+        silniki.append(silnik)
+    elif samochod["fuelType"] == "hybrydowy":
 
-#     @Column(name="sposob_platnosci")
-#     @Enumerated(EnumType.STRING)
-#     PaymentMethod paymentMethod;
+        silnik_elektryczny = {
+            "type": "electric",
+            "power": samochod["power"],
+            "fuelType": "elektryczny",
+            "capacity": samochod["capacity"]
+        }
+        silniki.append(silnik_elektryczny)
 
-#     @Column(name="czy_zarejestrowany")
-#     boolean registered;
+        silnik_spalinowy = {
+            "type": "combustion",
+            "power": samochod["power"],
+            "fuelType": random.choice(["benzyna", "diesel"]),
+            "displacement": samochod["displacement"],
+            "cylindersNumber": samochod["cylindersNumber"]
+        }
+        silniki.append(silnik_spalinowy)
 
-#     @Column(name="czy_ubezpieczony")
-#     boolean insured;
+    return silniki
 
-#     @ManyToOne(fetch = FetchType.EAGER)
-#     @JoinColumn(name="client_id")
-#     Client client;
 
-#     @OneToOne(fetch = FetchType.EAGER)
-#     @JoinColumn(name="car_id")
-#     Car car;
+def generowanie_transakcji(samochody, klienci):
 
-# }
-#KLIENT INDYWIDUALNY
-# {
-#   "type": "individual",
-#   "name": "John",
-#   "surname": "Doe",
-#   "pesel": "12345678901",
-#   "address": "123 Main Street, New York",
-#   "phoneNumber": "+1 123 456 789",
-#   "email": "john.doe@example.com"
-# }
+    all_avaliable_samochody = deepcopy(samochody)
+    all_avaliable_klienci = deepcopy(klienci)
 
-# KLIENT FIRMA
-# {
-#   "type": "corporate",
-#   "companyName": "Tech Solutions LLC",
-#   "nip": "1234567890",
-#   "address": "456 Business Avenue, Chicago",
-#   "phoneNumber": "+1 987 654 321",
-#   "email": "contact@techsolutions.com"
-# }
+    transakcje = []
+
+    for i in range(100):
+
+        car = random.choice(all_avaliable_samochody)
+        all_avaliable_samochody.remove(car)
+        client = random.choice(all_avaliable_klienci)
+        all_avaliable_klienci.remove(client)
+
+        payment_method = random.choice(["gotówka", "karta kredytowa", "przelew"])
+
+        total_amount = car["price"]
+
+        registered = random.choice([True, False])
+        insured = random.choice([True, False])
+
+        start_date = datetime(car["productionYear"], 1, 1) + relativedelta(months=4)
+        transactionDate = fake.date_time_between(start_date=start_date, end_date="now")
+
+        # Dodaj transakcję do listy
+        transakcje.append({
+            "transactionDate": transactionDate,
+            "totalAmount": total_amount,
+            "paymentMethod": payment_method,
+            "registered": registered,
+            "insured": insured,
+            "client": client,
+            "car": car
+        })
+    transactionDate = fake.date_time_between(start_date="-1y", end_date="now")
+
+
+# szukanie wartosci do enumow
+def znajdz_bodyType(samochody):
+    bodyType = set()
+    for samochod in samochody:
+        bodyType.add(samochod["bodyType"])
+    return list(bodyType)
+
+def znajdz_condition(samochody):
+    condition = set()
+    for samochod in samochody:
+        condition.add(samochod["condition"])
+    return list(condition)
+
+def znajdz_drivetrainType(samochody):
+    drivetrainType = set()
+    for samochod in samochody:
+        drivetrainType.add(samochod["drivetrainType"])
+    return list(drivetrainType)
+
+def znajdz_transmission(samochody):
+    transmission = set()
+    for samochod in samochody:
+        transmission.add(samochod["transmission"])
+    return list(transmission)
+
+def znajdz_fuelType(samochody):
+    fuelType = set()
+    for samochod in samochody:
+        for silnik in samochod["engines"]:
+            fuelType.add(silnik["fuelType"])
+    return list(fuelType)
+
+def znajdz_paymentMethod(transakcje):
+    paymentMethod = set()
+    for transakcja in transakcje:
+        paymentMethod.add(transakcja["paymentMethod"])
+    return list(paymentMethod)
+
+
+
+
 
 
 # def generowanie_klienta_indywidualnego():
@@ -218,7 +302,6 @@ def generowanie_samochodu(samochod):
 #         "email": email
 #     }
     
-
 # def generowanie_klienta_firmowego():
 #     type = "corporate"
 #     companyName = fake.company()
@@ -236,14 +319,41 @@ def generowanie_samochodu(samochod):
 #         "email": email
 #     }
 
-
-
-
 # for i in range(100):
 #     if i % 2 == 0:
 #         klienci.append(generowanie_klienta_indywidualnego())
 #     else:
 #         klienci.append(generowanie_klienta_firmowego())
+
+# samochody_po_filtrowaniu = filtrowanie_samochodow(scraper_output)
+
+# for samochod in samochody_po_filtrowaniu:
+#     samochod = generowanie_samochodu(samochod)
+#     samochody.append(samochod)
+
+# with open(output_samochody, "w", encoding="utf-8") as f:
+#     json.dump(samochody, f, ensure_ascii=False, indent=2)
+
+
+
+# bodyType = znajdz_bodyType(samochody)
+# condition = znajdz_condition(samochody)
+# drivetrainType = znajdz_drivetrainType(samochody)
+# transmission = znajdz_transmission(samochody)
+# silniki = znajdz_fuelType(samochody)
+# paymentMethod = znajdz_paymentMethod(transakcje)
+
+# enum = {
+#     "bodyType": bodyType,
+#     "condition": condition,
+#     "drivetrainType": drivetrainType,
+#     "transmission": transmission,
+#     "fuelType": silniki,
+#     "paymentMethod": paymentMethod
+# }
+
+# with open(output_enumy, "w", encoding="utf-8") as f:
+#     json.dump(enum, f, ensure_ascii=False, indent=2)
 
 # with open(output_klienci, "w", encoding="utf-8") as f:
 #     json.dump(klienci, f, ensure_ascii=False, indent=2)

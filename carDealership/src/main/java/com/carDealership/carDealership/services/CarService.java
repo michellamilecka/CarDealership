@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -23,12 +24,14 @@ import java.util.stream.Collectors;
 public class CarService {
     private final CarRepository carRepository;
     private final EngineRepository engineRepository;
+    private final FileStorageService fileStorageService;
     @PersistenceContext
     private EntityManager entityManager;
 
-    public CarService(CarRepository carRepository, EngineRepository engineRepository, EntityManager entityManager) {
+    public CarService(CarRepository carRepository, EngineRepository engineRepository, FileStorageService fileStorageService, EntityManager entityManager) {
         this.carRepository = carRepository;
         this.engineRepository = engineRepository;
+        this.fileStorageService = fileStorageService;
         this.entityManager = entityManager;
     }
 
@@ -49,9 +52,14 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
-    public CarReadDto save(CarCreateDto carCreateDto) {
-        var result = carRepository.save(carCreateDto.convertToCar());
-        return new CarReadDto(result);
+    public CarReadDto save(CarCreateDto carCreateDto, MultipartFile imageFile) {
+        var imagePath = fileStorageService.storeImage(imageFile);
+        var carEntity = carCreateDto.convertToCar();
+        carEntity.setImagePath(imagePath);
+        var result = carRepository.save(carEntity);
+        var carDto = new CarReadDto(result);
+        carDto.setImagePath(imagePath);
+        return carDto;
     }
 
     public void delete(int idCar) {
