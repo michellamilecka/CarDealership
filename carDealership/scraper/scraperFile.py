@@ -10,6 +10,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
+import random
+
 
 output_file = "carDealership/scraper/scraperResult_TEST.json"
 photos_dir = "carDealership/scraper/photosTEST/"
@@ -20,6 +22,10 @@ options.add_argument("--headless=new")
 options.add_argument("--disable-gpu")
 options.add_argument("--no-sandbox")
 options.add_argument("--window-size=1920,1080")
+options.add_argument("--incognito")
+# options.add_argument("--disable-blink-features=AutomationControlled")  # <-- ważne
+# options.add_experimental_option("excludeSwitches", ["enable-automation"])
+# options.add_experimental_option("useAutomationExtension", False)
 
 
 dozwolone_wartosci = {
@@ -43,6 +49,16 @@ dozwolone_wartosci = {
 
 # Initialize driver
 driver = webdriver.Chrome(options=options)
+# driver.execute_cdp_cmd(
+#     "Page.addScriptToEvaluateOnNewDocument",
+#     {
+#         "source": """
+#             Object.defineProperty(navigator, 'webdriver', {
+#                 get: () => undefined
+#             })
+#         """
+#     }
+# )
 driver.get(page_url)
 
 cars = driver.find_elements(By.CLASS_NAME, "allmodelscard.container.responsivegrid[data-counter]")
@@ -57,7 +73,7 @@ for car in cars:
         wanted_cars.append(car)
 
 
-car_links = []
+cars_with_links = []
 
 for wanted_car in wanted_cars:
     div = wanted_car.find_element(By.TAG_NAME, "div")
@@ -67,12 +83,13 @@ for wanted_car in wanted_cars:
     car_info = {}
     car_info["price"] = data["price"]
 
-    car_info["fuelType"] = {
-        "o" : "benzyna",
-        "e" : "elektryczny",
-        "d" : "diesel",
-        "h" : "hybrydowy"
-    }.get(data["fuelType"])
+    #fuelType trzeba pobierac ze strony juz danego samochodu bo tu sie zle pobiera
+    # car_info["fuelType"] = {
+    #     "o" : "benzyna",
+    #     "e" : "elektryczny",
+    #     "d" : "diesel",
+    #     "h" : "hybrydowy"
+    # }.get(data["fuelType"])
 
     car_info["bodyType"] = {
         "li" : "limuzyna",
@@ -90,18 +107,16 @@ for wanted_car in wanted_cars:
     car_link = wanted_car.find_element(By.XPATH, './/a[@aria-label="Informacje o pojeździe"]').get_attribute("href")
     car_info["link"] = car_link
 
-    car_links.append(car_info)
+    cars_with_links.append(car_info)
 
 
+# po wykonaniu tego wyzej mam liste samochodow z podstawowymi danymi i linkiem do wejscia w ich strone ze szczegolami
 
-
-filtered_cars = []
-
-def process_car(idx, car):
+def process_car(idx, car, filtered_cars):
     filtered_car = {}
     try:
         driver = webdriver.Chrome(options=options)
-        print(f"\n=== [Krok {idx + 1}/{len(car_links)}] ===")
+        print(f"\n=== [Krok {idx + 1}/{len(cars_with_links)}] ===")
         print(f"Przetwarzam: {car.get('name')} - {car.get('link')}")
 
         driver.get(car["link"])
@@ -187,10 +202,18 @@ def process_car(idx, car):
             )
             # Poczekaj aż dane się załadują
             # Parsuj dane
-            car = parse_technical_data_TEST(driver, car)
-            car["technical_data_loaded"] = True
+            filtered_car = parse_technical_data_TEST(driver, car)
+            filtered_car["technical_data_loaded"] = True
             print("✅ Dane techniczne załadowane za pomoca GUZIKA.")
             #filtered_cars.append(car)
+            # Tylko jeśli dane załadowano guzikiem, dodaj do filtered_cars:
+            if filtered_car.get("technical_data_loaded") is True:
+                # filtered_car = {
+                #     dozwolone_wartosci.get(k, k): v
+                #     for k, v in car.items()
+                #     if k in dozwolone_wartosci
+                # }
+                filtered_cars.append(filtered_car)
             
         except Exception as e:
             print(f"❌ Błąd przy klikaniu w przycisk, probuje inaczej.")
@@ -207,11 +230,11 @@ def process_car(idx, car):
                 car["technical_link"] = ""
                 car["technical_data_loaded"] = False
 
-        filtered_car = {
-            dozwolone_wartosci.get(k, k): v
-            for k, v in car.items()
-            if k in dozwolone_wartosci
-        }
+        # filtered_car = {
+        #     dozwolone_wartosci.get(k, k): v
+        #     for k, v in car.items()
+        #     if k in dozwolone_wartosci
+        # }
     except Exception as e:
         print(f"❌ Błąd ogólny.")
     finally:
@@ -243,6 +266,20 @@ def parse_technical_data_TEST(driver, car):
             for k, v in car.items()
             if k in dozwolone_wartosci
         }
+
+        # === Określenie fuelType ===
+        has_capacity = "capacity" in filtered_car
+        has_displacement = "displacement" in filtered_car
+        has_cylinders = "cylindersNumber" in filtered_car
+
+        if has_capacity and has_displacement and has_cylinders:
+            filtered_car["fuelType"] = "hybrydowy"
+        elif has_capacity and not has_displacement and not has_cylinders:
+            filtered_car["fuelType"] = "elektryczny"
+        elif has_displacement and has_cylinders and not has_capacity:
+            filtered_car["fuelType"] = random.choice(["benzyna", "diesel"])
+        else:
+            filtered_car["fuelType"] = "nieznany"
     
     except Exception as e:
         print(f"❌ Błąd główny przy parsowaniu danych technicznych: {e}")
@@ -251,9 +288,10 @@ def parse_technical_data_TEST(driver, car):
 
 
 processed_cars = []
+filtered_cars = []
 
 with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
-    futures = [executor.submit(process_car, idx, car) for idx, car in enumerate(car_links)]
+    futures = [executor.submit(process_car, idx, car, filtered_cars) for idx, car in enumerate(cars_with_links)]
 
     for future in as_completed(futures):
         processed_cars.append(future.result())
@@ -267,7 +305,7 @@ for car in processed_cars:
     if not car.get("technical_link"):
         continue
 
-    if not car.get("technical_data_loaded"):
+    if car.get("technical_data_loaded") == False:
         driver.get(car["technical_link"])
 
         technical_data_facts = driver.find_elements(By.CLASS_NAME, "cmp-technicaldatafact")
@@ -279,11 +317,28 @@ for car in processed_cars:
         result = " ".join(takewhile(lambda x: "drive" not in x.lower(), car["name"].split()[1:]))
         car["model"] = result
 
+    
     filtered_car = {
         dozwolone_wartosci[k]: v
         for k, v in car.items()
         if k in dozwolone_wartosci
     }
+
+    # === Określenie fuelType ===
+    has_capacity = "capacity" in filtered_car
+    has_displacement = "displacement" in filtered_car
+    has_cylinders = "cylindersNumber" in filtered_car
+
+    if has_capacity and has_displacement and has_cylinders:
+        filtered_car["fuelType"] = "hybrydowy"
+    elif has_capacity and not has_displacement and not has_cylinders:
+        filtered_car["fuelType"] = "elektryczny"
+    elif has_displacement and has_cylinders and not has_capacity:
+        filtered_car["fuelType"] = random.choice(["benzyna", "diesel"])
+    else:
+        filtered_car["fuelType"] = "nieznany"
+
+
     filtered_cars.append(filtered_car)
 
 

@@ -278,22 +278,6 @@
     "model": "X6"
   },
   {
-    "price": "675000.0",
-    "fuelType": "hybrydowy",
-    "bodyType": "suv",
-    "name": "BMW XM 50e",
-    "color": "",
-    "power": "350 (476) 3",
-    "transmission": "8-stopniowa, automatyczna",
-    "drivetrainType": "na wszystkie koła",
-    "cylindersNumber": "6",
-    "displacement": "2 998",
-    "acceleration": "5,1 5",
-    "topSpeed": "250",
-    "capacity": "25,7",
-    "model": "XM 50e"
-  },
-  {
     "price": "422500.0",
     "fuelType": "benzyna",
     "bodyType": "suv",
@@ -479,20 +463,6 @@
     "model": "X1 M35i"
   },
   {
-    "price": "204000.0",
-    "fuelType": "benzyna",
-    "bodyType": "suv",
-    "name": "BMW X2 sDrive20i",
-    "imagePath": "carDealership/scraper/photos/1935da9e0f5642e8bed117a4b0001993.png",
-    "color": "",
-    "power": "150 (204)",
-    "transmission": "1-stopniowa, automatyczna",
-    "drivetrainType": "Napęd przedni",
-    "acceleration": "8,6",
-    "capacity": "64,8",
-    "model": "X2"
-  },
-  {
     "price": "618500.0",
     "fuelType": "benzyna",
     "bodyType": "coupe",
@@ -621,22 +591,6 @@
   {
     "price": "230500.0",
     "fuelType": "benzyna",
-    "bodyType": "coupe",
-    "name": "BMW 420i Coupe",
-    "imagePath": "carDealership/scraper/photos/9305325807f64d6fb33229dcb59d6f7c.png",
-    "color": "",
-    "power": "135 (184)",
-    "transmission": "8-stopniowa, automatyczna",
-    "drivetrainType": "Napęd tylny",
-    "cylindersNumber": "4",
-    "displacement": "1 998",
-    "acceleration": "7,5",
-    "topSpeed": "240",
-    "model": "420i Coupe"
-  },
-  {
-    "price": "230500.0",
-    "fuelType": "benzyna",
     "bodyType": "cabriolet",
     "name": "BMW 420i Cabrio",
     "imagePath": "carDealership/scraper/photos/0fbb40599fdb42559fba99c001108f5a.png",
@@ -714,21 +668,6 @@
     "acceleration": "5,9",
     "topSpeed": "250",
     "model": "318i Limuzyna"
-  },
-  {
-    "price": "493500.0",
-    "fuelType": "benzyna",
-    "bodyType": "coupe",
-    "name": "BMW 840i Coupe",
-    "color": "",
-    "power": "245 (333)",
-    "transmission": "8-stopniowa, automatyczna",
-    "drivetrainType": "Napęd tylny",
-    "cylindersNumber": "6",
-    "displacement": "2 998",
-    "acceleration": "5,2",
-    "topSpeed": "250",
-    "model": "840i Coupe"
   },
   {
     "price": "542500.0",
@@ -943,15 +882,6 @@
     "model": "216i Active Tourer"
   },
   {
-    "price": "342500.0",
-    "fuelType": "benzyna",
-    "bodyType": "cabriolet",
-    "name": "BMW Z4 M40i",
-    "imagePath": "carDealership/scraper/photos/3997a8e73de8420194c7712a8494342a.png",
-    "color": "Niebieski Portimao M metalizowany",
-    "model": "Z4 M40i"
-  },
-  {
     "price": "527500.0",
     "fuelType": "diesel",
     "bodyType": "suv",
@@ -1053,20 +983,6 @@
     "model": "X4 M40d"
   },
   {
-    "price": "214000.0",
-    "fuelType": "diesel",
-    "bodyType": "suv",
-    "name": "BMW X2 sDrive20d",
-    "imagePath": "carDealership/scraper/photos/923202d132804a08a84907d81e4ed3cd.png",
-    "color": "",
-    "power": "150 (204)",
-    "transmission": "1-stopniowa, automatyczna",
-    "drivetrainType": "Napęd przedni",
-    "acceleration": "8,6",
-    "capacity": "64,8",
-    "model": "X2"
-  },
-  {
     "price": "266500.0",
     "fuelType": "diesel",
     "bodyType": "suv",
@@ -1165,22 +1081,6 @@
     "price": "245500.0",
     "fuelType": "diesel",
     "bodyType": "coupe",
-    "name": "BMW 420d Coupe",
-    "imagePath": "carDealership/scraper/photos/bfd7e5e30e4943b08f58f8ab5d4336c6.png",
-    "color": "",
-    "power": "135 (184)",
-    "transmission": "8-stopniowa, automatyczna",
-    "drivetrainType": "Napęd tylny",
-    "cylindersNumber": "4",
-    "displacement": "1 998",
-    "acceleration": "7,5",
-    "topSpeed": "240",
-    "model": "420d Coupe"
-  },
-  {
-    "price": "245500.0",
-    "fuelType": "diesel",
-    "bodyType": "coupe",
     "name": "BMW 420d Gran Coupe",
     "imagePath": "carDealership/scraper/photos/6847fb6030864f2c8ba5cea3586807f8.png",
     "color": "Szary Skyscraper metalizowany",
@@ -1208,21 +1108,6 @@
     "acceleration": "8,2",
     "topSpeed": "236",
     "model": "420d Cabrio"
-  },
-  {
-    "price": "519000.0",
-    "fuelType": "diesel",
-    "bodyType": "coupe",
-    "name": "BMW 840d xDrive Coupe",
-    "color": "",
-    "power": "245 (333)",
-    "transmission": "8-stopniowa, automatyczna",
-    "drivetrainType": "Napęd tylny",
-    "cylindersNumber": "6",
-    "displacement": "2 998",
-    "acceleration": "5,2",
-    "topSpeed": "250",
-    "model": "840d"
   },
   {
     "price": "214000.0",
