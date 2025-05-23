@@ -7,6 +7,8 @@ import json
 import random
 from copy import deepcopy
 import os
+import requests
+import json
 
 output_klienci = "carDealership/generator/clients.json"
 output_samochody = "carDealership/generator/cars.json"
@@ -204,43 +206,6 @@ def filtrowanie_silnika(samochod):
     return silniki
 
 
-def generowanie_transakcji(samochody, klienci):
-
-    all_avaliable_samochody = deepcopy(samochody)
-    all_avaliable_klienci = deepcopy(klienci)
-
-    transakcje = []
-
-    for i in range(100):
-
-        car = random.choice(all_avaliable_samochody)
-        all_avaliable_samochody.remove(car)
-        client = random.choice(all_avaliable_klienci)
-        all_avaliable_klienci.remove(client)
-
-        payment_method = random.choice(["gotówka", "karta kredytowa", "przelew"])
-
-        total_amount = car["price"]
-
-        registered = random.choice([True, False])
-        insured = random.choice([True, False])
-
-        start_date = datetime(car["productionYear"], 1, 1) + relativedelta(months=4)
-        transactionDate = fake.date_time_between(start_date=start_date, end_date="now")
-
-        # Dodaj transakcję do listy
-        transakcje.append({
-            "transactionDate": transactionDate,
-            "totalAmount": total_amount,
-            "paymentMethod": payment_method,
-            "registered": registered,
-            "insured": insured,
-            "client": client,
-            "car": car
-        })
-    transactionDate = fake.date_time_between(start_date="-1y", end_date="now")
-
-
 # szukanie wartosci do enumow
 def znajdz_bodyType(samochody):
     bodyType = set()
@@ -279,10 +244,52 @@ def znajdz_paymentMethod(transakcje):
         paymentMethod.add(transakcja["paymentMethod"])
     return list(paymentMethod)
 
+def generowanie_transakcji():
+
+    all_avaliable_samochody = requests.get("http://localhost:8080/api/cars").json()
+    all_avaliable_klienci = requests.get("http://localhost:8080/api/clients").json()
+    
+    transakcje = []
+
+    for _ in range(25):
+
+        car = random.choice(all_avaliable_samochody)
+        all_avaliable_samochody.remove(car)
+        client = random.choice(all_avaliable_klienci)
+        all_avaliable_klienci.remove(client)
+
+        car_id = car["id"]
+        client_id = client["id"]
+
+        payment_method = random.choice(["gotówka", "karta kredytowa", "przelew"])
+
+        total_amount = car["price"]
+
+        registered = random.choice([True, False])
+        insured = random.choice([True, False])
+
+        start_date = datetime(car["productionYear"], 1, 1) + relativedelta(months=2)
+        transactionDate = fake.date_time_between(start_date=start_date, end_date="now")
+        transactionDate_str = transactionDate.strftime("%Y-%m-%dT%H:%M:%S")
+
+        # Dodaj transakcję do listy
+        transakcje.append({
+            "transactionDate": transactionDate_str,
+            "totalAmount": total_amount,
+            "paymentMethod": payment_method,
+            "registered": registered,
+            "insured": insured,
+            "clientId": client_id,
+            "carId": car_id
+        })
+        
+    return transakcje
 
 
+transakcje = generowanie_transakcji()
 
-
+with open(output_transakcje, "w", encoding="utf-8") as f:
+    json.dump(transakcje, f, ensure_ascii=False, indent=2)
 
 # def generowanie_klienta_indywidualnego():
 #     type = "individual"

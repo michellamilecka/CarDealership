@@ -42,6 +42,12 @@ public class CarService {
                 .collect(Collectors.toList());
     }
 
+    public CarReadDto getCarById(Integer id) {
+        return this.carRepository.findById(id)
+                .map(CarReadDto::new)
+                .orElse(null);
+    }
+
     public List<CarReadDto> getAllFilteredCars(Map<String, String> filters) {
         Specification<Car> spec = CarSpecifications.carModelWithFilters(filters);
         List<Car> result = carRepository.findAll(spec, Sort.by(Sort.Direction.ASC, "id"));
