@@ -64,7 +64,7 @@ class AddCarWidget extends StatelessWidget {
                           overlayColor: Color(0xFF00A8E8)
                       ),
                       child: Text(
-                        'Wyszukaj',
+                        'Dodaj',
                         style: TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PriceSlider extends StatelessWidget {
-  final double price;
+class AccelerationSlider extends StatelessWidget {
+  final double acceleration;
   final ValueChanged<double> onChanged;
 
-  const PriceSlider({
+  const AccelerationSlider({
     Key? key,
-    required this.price,
+    required this.acceleration,
     required this.onChanged,
   }) : super(key: key);
 
@@ -17,7 +17,7 @@ class PriceSlider extends StatelessWidget {
       children: [
         Center(
           child: Text(
-            'Cena',
+            'Przyspieszenie',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -25,8 +25,9 @@ class PriceSlider extends StatelessWidget {
             ),
           ),
         ),
+        // Zmiana, by pokazywało wartości z przecinkiem (np. 2.5 s)
         Text(
-          '${price.toStringAsFixed(0)} PLN',
+          '${acceleration.toStringAsFixed(1)} s', // 1 miejsce po przecinku
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -35,11 +36,11 @@ class PriceSlider extends StatelessWidget {
         ),
         Slider(
           min: 0,
-          max: 2000000,
+          max: 10,
           divisions: 100,
-          label: price.toStringAsFixed(0),
+          label: acceleration.toStringAsFixed(1),
           onChanged: onChanged,
-          value: price,
+          value: acceleration,
           activeColor: Colors.blue,
           inactiveColor: Colors.grey,
         ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PriceSlider extends StatelessWidget {
-  final double price;
+class TopspeedSlider extends StatelessWidget {
+  final double topSpeed;
   final ValueChanged<double> onChanged;
 
-  const PriceSlider({
+  const TopspeedSlider({
     Key? key,
-    required this.price,
+    required this.topSpeed,
     required this.onChanged,
   }) : super(key: key);
 
@@ -17,7 +17,7 @@ class PriceSlider extends StatelessWidget {
       children: [
         Center(
           child: Text(
-            'Cena',
+            'Maksymalna predkosc',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -25,8 +25,9 @@ class PriceSlider extends StatelessWidget {
             ),
           ),
         ),
+
         Text(
-          '${price.toStringAsFixed(0)} PLN',
+          '${topSpeed.toStringAsFixed(1)} km/h',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -35,11 +36,11 @@ class PriceSlider extends StatelessWidget {
         ),
         Slider(
           min: 0,
-          max: 2000000,
-          divisions: 100,
-          label: price.toStringAsFixed(0),
+          max: 400,
+          divisions: 1000,
+          label: topSpeed.toStringAsFixed(1),
           onChanged: onChanged,
-          value: price,
+          value: topSpeed,
           activeColor: Colors.blue,
           inactiveColor: Colors.grey,
         ),

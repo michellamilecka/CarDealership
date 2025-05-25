@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class PriceSlider extends StatelessWidget {
-  final double price;
+class MileageSlider extends StatelessWidget {
+  final double mileage;
   final ValueChanged<double> onChanged;
 
-  const PriceSlider({
+  const MileageSlider({
     Key? key,
-    required this.price,
+    required this.mileage,
     required this.onChanged,
   }) : super(key: key);
 
@@ -17,7 +17,7 @@ class PriceSlider extends StatelessWidget {
       children: [
         Center(
           child: Text(
-            'Cena',
+            'Przebieg',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -25,8 +25,9 @@ class PriceSlider extends StatelessWidget {
             ),
           ),
         ),
+
         Text(
-          '${price.toStringAsFixed(0)} PLN',
+          '${mileage.toStringAsFixed(1)} km',
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -35,11 +36,11 @@ class PriceSlider extends StatelessWidget {
         ),
         Slider(
           min: 0,
-          max: 2000000,
+          max: 100000,
           divisions: 100,
-          label: price.toStringAsFixed(0),
+          label: mileage.toStringAsFixed(1),
           onChanged: onChanged,
-          value: price,
+          value: mileage,
           activeColor: Colors.blue,
           inactiveColor: Colors.grey,
         ),

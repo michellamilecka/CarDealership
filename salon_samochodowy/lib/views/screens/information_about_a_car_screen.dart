@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import '../widgets/information_about_a_car_widget.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/footer_widget.dart';
+import '../classes/car.dart';
 
 class InformationAboutACarScreen extends StatelessWidget{
-  const InformationAboutACarScreen({super.key, required String title});
+  final Car car;
+  const InformationAboutACarScreen({super.key, required this.car});
 
 
   @override
@@ -17,10 +19,10 @@ class InformationAboutACarScreen extends StatelessWidget{
       body: Column(
           children: [
             const SizedBox(height: 16),
-            InformationAboutACarWidget(),
+            InformationAboutACarWidget(car:car),
           ]
       ),
-
+      bottomNavigationBar: FooterWidget(),
     );
   }
 
