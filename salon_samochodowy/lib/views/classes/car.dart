@@ -47,15 +47,15 @@ class Car {
       name: json['name'],
       model: json['model'],
       color: json['color'],
-      acceleration: json['acceleration'],
+      acceleration: json['acceleration'].toDouble(), // Upewnij się, że to double
       transmission: json['transmission'],
-      topSpeed: json['topSpeed'],
-      gasMileage: json['gasMileage'],
+      topSpeed: json['topSpeed'].toDouble(), // Upewnij się, że to double
+      gasMileage: json['gasMileage'].toDouble(), // Upewnij się, że to double
       mileage: json['mileage'],
-      drivetrainType: json['drivetrainType'],
+      drivetrainType: _normalizeDrivetrain(json['drivetrainType']),
       description: json['description'],
       bodyType: json['bodyType'],
-      price: json['price'],
+      price: json['price'].toDouble(), // Upewnij się, że to double
       imagePath: json['imagePath'],
       vinNumber: json['vinNumber'],
       productionYear: json['productionYear'],
@@ -64,6 +64,26 @@ class Car {
           .map((engine) => Engine.fromJson(engine))
           .toList(),
     );
+  }
+
+  static String _normalizeDrivetrain(String? drivetrain) {
+    if (drivetrain == null) return 'Unknown';
+    // Zamiana błędnych znaków na poprawne
+    String normalized = drivetrain
+        .replaceAll('Ä', 'ę')
+        .replaceAll('Ä', 'ą')
+        .replaceAll('Å', 'ń')
+        .replaceAll('Å', 'ł')
+        .replaceAll('Å', 'ś')
+        .replaceAll('Å¼', 'ż')
+        .replaceAll('Åº', 'ź')
+        .replaceAll('Ä', 'ć')
+        .replaceAll('Ã³', 'ó');
+
+    // Normalizacja na standardowe wartości
+
+        return normalized; // Zachowaj znormalizowaną wartość, jeśli nie pasuje
+
   }
 
   Map<String, dynamic> toJson() {
@@ -76,7 +96,7 @@ class Car {
       'transmission': transmission,
       'topSpeed': topSpeed,
       'gasMileage': gasMileage,
-      'mileage':mileage,
+      'mileage': mileage,
       'drivetrainType': drivetrainType,
       'description': description,
       'bodyType': bodyType,
@@ -84,10 +104,12 @@ class Car {
       'imagePath': imagePath,
       'vinNumber': vinNumber,
       'productionYear': productionYear,
-      'condition':condition,
+      'condition': condition,
+      'engines': engines.map((engine) => {
+        'id': engine.id,
+        'power': engine.power,
+        'fuelType': engine.fuelType,
+      }).toList(),
     };
   }
-
 }
-
-

@@ -3,6 +3,10 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 
 class AddPhotoWidget extends StatefulWidget {
+  final Function(String) onImageSelected; // Callback z wybraną ścieżką
+
+  const AddPhotoWidget({super.key, required this.onImageSelected});
+
   @override
   _AddPhotoWidgetState createState() => _AddPhotoWidgetState();
 }
@@ -16,6 +20,7 @@ class _AddPhotoWidgetState extends State<AddPhotoWidget> {
       setState(() {
         _image = File(pickedFile.path);
       });
+      widget.onImageSelected(pickedFile.path); // Zwróć ścieżkę pliku do rodzica
     }
   }
 
@@ -44,7 +49,12 @@ class _AddPhotoWidgetState extends State<AddPhotoWidget> {
             )
                 : ClipRRect(
               borderRadius: BorderRadius.circular(10),
-              child: Image.file(_image!, fit: BoxFit.cover, width: 200, height: 200),
+              child: Image.file(
+                _image!,
+                fit: BoxFit.cover,
+                width: 200,
+                height: 200,
+              ),
             ),
           ),
         ),
@@ -52,5 +62,3 @@ class _AddPhotoWidgetState extends State<AddPhotoWidget> {
     );
   }
 }
-
-

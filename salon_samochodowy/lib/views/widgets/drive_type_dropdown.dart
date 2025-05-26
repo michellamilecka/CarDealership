@@ -33,9 +33,9 @@ class DriveTypeDropdown extends StatelessWidget {
           ),
           onChanged: onChanged,
           items: <String>[
-            'tylnie koła',
-            'przednie koła',
-            'xDrive'
+            'Napęd tylny',
+            'Napęd przedni',
+            'na wszystkie koła'
           ].map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,

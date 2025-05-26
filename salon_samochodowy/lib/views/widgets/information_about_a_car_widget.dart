@@ -9,113 +9,458 @@ import '../screens/client_form_screen.dart';
 import '../classes/car.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:image/image.dart' as img;
 
 double _parseDouble(String value, double defaultValue) {
   value = value.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.').trim();
   return double.tryParse(value) ?? defaultValue;
 }
+
 int _parseInt(String value, int defaultValue) {
   value = value.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.').trim();
   return int.tryParse(value) ?? defaultValue;
 }
 
-
-
 class InformationAboutACarWidget extends StatefulWidget {
   final Car car;
 
   const InformationAboutACarWidget({super.key, required this.car});
+
   @override
   _InformationAboutACarWidgetState createState() => _InformationAboutACarWidgetState();
 }
 
 class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget> {
   bool _isEditing = false;
+  late List<TextEditingController> _enginePowerControllers;
+  late List<TextEditingController> _engineFuelTypeControllers;
+  double _displayWidth = 200.0;
+  double _displayHeight = 235.0;
+  bool _isLoadingImage = true;
+  bool _isCarUnavailable = false; // Track car availability
+
+  // Fetch transactions to check if the car is unavailable
+  Future<void> _checkCarAvailability() async {
+    try {
+      final response = await http.get(Uri.parse('http://192.168.68.103:8080/api/transactions'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        final unavailableCarIds = data
+            .map((transaction) => transaction['car']['id'].toString())
+            .toSet();
+        setState(() {
+          _isCarUnavailable = unavailableCarIds.contains(widget.car.id.toString());
+          print('Car ${widget.car.id} is ${_isCarUnavailable ? 'unavailable' : 'available'}');
+        });
+      } else {
+        print('Failed to fetch transactions: ${response.statusCode} - ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error fetching transactions: $e');
+    }
+  }
+
+  // Show popup for unavailable car
+  Future<void> _showUnavailableDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            'Auto niedostępne',
+            style: TextStyle(color: Colors.red),
+          ),
+          content: Text(
+            'Ten samochód jest niedostępny, ponieważ został już sprzedany.',
+            style: TextStyle(color: Colors.black),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'OK',
+                style: TextStyle(color: Colors.blue),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _checkImageDimensions() async {
+    try {
+      final response = await http.get(Uri.parse('http://192.168.68.103:8080/api/cars/${widget.car.id}/image'));
+      if (response.statusCode == 200) {
+        final originalImage = img.decodeImage(response.bodyBytes);
+        if (originalImage != null) {
+          if (originalImage.width > 1128 || originalImage.height > 921) {
+            setState(() {
+              _displayWidth = 200.0;
+              _displayHeight = 120.0;
+              _isLoadingImage = false;
+            });
+          } else {
+            setState(() {
+              _isLoadingImage = false;
+            });
+          }
+        } else {
+          print('Failed to decode image');
+          setState(() {
+            _isLoadingImage = false;
+          });
+        }
+      } else {
+        print('Failed to load image: ${response.statusCode}');
+        setState(() {
+          _isLoadingImage = false;
+        });
+      }
+    } catch (e) {
+      print('Error loading or checking image dimensions: $e');
+      setState(() {
+        _isLoadingImage = false;
+      });
+    }
+  }
+
+  Future<void> _deleteCar() async {
+    try {
+      final response = await http.delete(
+        Uri.parse('http://192.168.68.103:8080/api/cars/${widget.car.id}'),
+        headers: {
+          "Accept": "application/json",
+        },
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        print("Samochód został usunięty!");
+        Navigator.of(context).pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Samochód został usunięty pomyślnie',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Colors.blue,
+          ),
+        );
+      } else {
+        print("Błąd usuwania samochodu: ${response.statusCode}");
+        String responseBody = utf8.decode(response.bodyBytes);
+        print("Odpowiedź serwera: $responseBody");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Błąd podczas usuwania samochodu')),
+        );
+      }
+    } catch (e) {
+      print("Błąd połączenia podczas usuwania samochodu: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Błąd połączenia z serwerem')),
+      );
+    }
+  }
+
+  Future<void> _showDeleteConfirmationDialog() async {
+    if (_isCarUnavailable) {
+      await _showUnavailableDialog();
+      return;
+    }
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(
+            'Potwierdzenie usunięcia',
+            style: TextStyle(color: Colors.blue),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  'Czy na pewno chcesz usunąć ten samochód?',
+                  style: TextStyle(color: Colors.black),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                'Anuluj',
+                style: TextStyle(color: Colors.blue),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Usuń',
+                style: TextStyle(color: Colors.blue),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+                _deleteCar();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> updateCar() async {
-    final url = Uri.parse('http://10.0.2.2:8080/api/cars');
+    if (_isCarUnavailable) {
+      await _showUnavailableDialog();
+      return;
+    }
+
+    final carUrl = Uri.parse('http://192.168.68.103:8080/api/cars');
+    final engineUrl = Uri.parse('http://192.168.68.103:8080/api/engines');
+
+    List<Map<String, dynamic>> updatedEngines = [];
+    for (int i = 0; i < _enginePowerControllers.length; i++) {
+      String type = _engineFuelTypeControllers[i].text.toLowerCase() == 'elektryczny' ? 'electric' : 'combustion';
+      updatedEngines.add({
+        "id": i < widget.car.engines.length ? widget.car.engines[i].id : 0,
+        "type": type,
+        "power": _parseInt(_enginePowerControllers[i].text.replaceAll(' KM', ''),
+            i < widget.car.engines.length ? widget.car.engines[i].power.round() : 0),
+        "fuelType": _engineFuelTypeControllers[i].text,
+      });
+    }
 
     Map<String, dynamic> updatedCar = {
       "id": widget.car.id,
       "name": _nameController.text,
       "model": _modelController.text,
       "color": _colorController.text,
-      "acceleration": _parseDouble(_accelerationController.text, widget.car.acceleration),
+      "acceleration": _parseDouble(_accelerationController.text.replaceAll(' s', ''),
+          widget.car.acceleration),
       "transmission": _transmissionController.text,
-      "topSpeed": _parseDouble(_topSpeedController.text, widget.car.topSpeed),
-      "gasMileage": _parseDouble(_gasMileageController.text, widget.car.gasMileage),
-      'mileage':_parseInt(_mileageController.text,widget.car.mileage),
+      "topSpeed": _parseDouble(_topSpeedController.text.replaceAll(' km/h', ''),
+          widget.car.topSpeed),
+      "gasMileage": _parseDouble(_gasMileageController.text.replaceAll(' l', ''),
+          widget.car.gasMileage),
+      "mileage": _parseInt(_mileageController.text.replaceAll(' km', ''),
+          widget.car.mileage),
       "drivetrainType": _driveTypeController.text,
       "description": _descriptionController.text,
       "bodyType": _bodyTypeController.text,
-      "price": _parseDouble(_priceController.text, widget.car.price),
-      "imagePath": "zobaczymy",
+      "price": _parseDouble(_priceController.text.replaceAll(' PLN', ''),
+          widget.car.price),
+      "imagePath": widget.car.imagePath,
       "vinNumber": _vinNumberController.text,
       "productionYear": int.tryParse(_productionYearController.text) ?? 1999,
-      "condition":_conditionController.text,
+      "condition": _conditionController.text,
     };
 
-    final response = await http.put(
-      url,
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode(updatedCar),
-    );
+    try {
+      final carResponse = await http.put(
+        carUrl,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Accept": "application/json",
+        },
+        body: utf8.encode(jsonEncode(updatedCar)),
+      );
 
-    if (response.statusCode == 200) {
-      print(" Samochód został zaktualizowany!");
-    } else {
-      print("Błąd aktualizacji: ${response.statusCode}");
-      print("Odpowiedź serwera: ${response.body}");
+      if (carResponse.statusCode == 200) {
+        print("Samochód został zaktualizowany!");
+      } else {
+        print("Błąd aktualizacji samochodu: ${carResponse.statusCode}");
+        String responseBody = utf8.decode(carResponse.bodyBytes);
+        print("Odpowiedź serwera (samochód): $responseBody");
+        return;
+      }
+
+      for (var engine in updatedEngines) {
+        try {
+          print("Wysyłanie żądania dla silnika o ID ${engine['id']}:");
+          print("Metoda: PUT");
+          print("URL: $engineUrl");
+          print("Nagłówki: ${{
+            "Content-Type": "application/json; charset=utf-8",
+            "Accept": "application/json",
+          }}");
+          print("Ciało żądania: ${jsonEncode(engine)}");
+
+          final engineResponse = await http.put(
+            engineUrl,
+            headers: {
+              "Content-Type": "application/json; charset=utf-8",
+              "Accept": "application/json",
+            },
+            body: utf8.encode(jsonEncode(engine)),
+          );
+
+          if (engineResponse.statusCode == 200) {
+            print("Silnik o ID ${engine['id']} został zaktualizowany!");
+          } else {
+            print("Błąd aktualizacji silnika o ID ${engine['id']}: ${engineResponse.statusCode}");
+            String engineResponseBody = utf8.decode(engineResponse.bodyBytes);
+            print("Odpowiedź serwera (silnik): $engineResponseBody");
+          }
+        } catch (e) {
+          print("Błąd połączenia podczas aktualizacji silnika o ID ${engine['id']}: $e");
+        }
+      }
+    } catch (e) {
+      print("Błąd połączenia podczas aktualizacji samochodu: $e");
     }
   }
 
-  late TextEditingController _priceController ;
-  late TextEditingController _nameController ;
-  late TextEditingController _colorController ;
-  late TextEditingController _modelController ;
-  late TextEditingController _bodyTypeController ;
-  late TextEditingController _driveTypeController ;
-  //late TextEditingController _fuelTypeController ;
-  late TextEditingController _transmissionController ;
-  //late TextEditingController _powerController ;
-  late TextEditingController _descriptionController ;
-  late TextEditingController _accelerationController ;
-  late TextEditingController _topSpeedController ;
-  late TextEditingController _gasMileageController ;
+  String _decodeText(String text) {
+    if (text.isEmpty) return text;
+
+    try {
+      if (text.contains('Ä') || text.contains('Ć') || text.contains('ć') ||
+          text.contains('Å') || text.contains('Ã') || text.contains('â€')) {
+        try {
+          List<int> bytes = latin1.encode(text);
+          String decoded = utf8.decode(bytes);
+          return decoded;
+        } catch (e) {
+          return _fixPolishCharsManually(text);
+        }
+      }
+      return text;
+    } catch (e) {
+      return _fixPolishCharsManually(text);
+    }
+  }
+
+  String _fixPolishCharsManually(String text) {
+    return text
+        .replaceAll('Ä…', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ä‡', 'ć')
+        .replaceAll('Å‚', 'ł')
+        .replaceAll('Å„', 'ń')
+        .replaceAll('Ã³', 'ó')
+        .replaceAll('Åś', 'ś')
+        .replaceAll('Å¼', 'ź')
+        .replaceAll('Å»', 'ż')
+        .replaceAll('Ä„', 'Ą')
+        .replaceAll('Ä˜', 'Ę')
+        .replaceAll('Ä†', 'Ć')
+        .replaceAll('Å', 'Ł')
+        .replaceAll('Åƒ', 'Ń')
+        .replaceAll('Ã"', 'Ó')
+        .replaceAll('Å', 'Ś')
+        .replaceAll('Å¹', 'Ź')
+        .replaceAll('Å½', 'Ż')
+        .replaceAll('â€™', '\'')
+        .replaceAll('â€œ', '"')
+        .replaceAll('â€', '"')
+        .replaceAll('â€"', '–')
+        .replaceAll('â€"', '—')
+        .replaceAll('Äą', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ĺ‚', 'ł')
+        .replaceAll('Ĺ„', 'ń')
+        .replaceAll('Ĺś', 'ś')
+        .replaceAll('Ĺş', 'ź')
+        .replaceAll('Ĺ¼', 'ż');
+  }
+
+  late TextEditingController _priceController;
+  late TextEditingController _nameController;
+  late TextEditingController _colorController;
+  late TextEditingController _modelController;
+  late TextEditingController _bodyTypeController;
+  late TextEditingController _driveTypeController;
+  late TextEditingController _transmissionController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _accelerationController;
+  late TextEditingController _topSpeedController;
+  late TextEditingController _gasMileageController;
   late TextEditingController _mileageController;
-  late TextEditingController _vinNumberController ;
-  late TextEditingController _productionYearController ;
+  late TextEditingController _vinNumberController;
+  late TextEditingController _productionYearController;
   late TextEditingController _conditionController;
+
   @override
   void initState() {
     super.initState();
+    print('Initializing with car: ${widget.car.toJson()}');
+    print('Engines count: ${widget.car.engines?.length ?? 0}');
+
     _priceController = TextEditingController(text: '${widget.car.price} PLN');
-    _colorController = TextEditingController(text: '${widget.car.color}');
-    _modelController = TextEditingController(text: '${widget.car.model}');
-    _bodyTypeController = TextEditingController(text: '${widget.car.bodyType}');
-    _driveTypeController = TextEditingController(text: '${widget.car.drivetrainType}');
-    //_fuelTypeController = TextEditingController(text: '${widget.car.}');
-    _transmissionController = TextEditingController(text: '${widget.car.transmission}');
-    //_powerController = TextEditingController(text: '${widget.car.power}');
-    _descriptionController = TextEditingController(text: '${widget.car.description}');
-    _nameController = TextEditingController(text: '${widget.car.name}');
+    _colorController = TextEditingController(text: _decodeText(widget.car.color ?? ''));
+    _modelController = TextEditingController(text: _decodeText(widget.car.model ?? ''));
+    _bodyTypeController = TextEditingController(text: _decodeText(widget.car.bodyType ?? ''));
+    _driveTypeController = TextEditingController(text: _decodeText(widget.car.drivetrainType ?? ''));
+    _transmissionController = TextEditingController(text: _decodeText(widget.car.transmission ?? ''));
+    _descriptionController = TextEditingController(text: _decodeText(widget.car.description ?? ''));
+    _nameController = TextEditingController(text: _decodeText(widget.car.name ?? ''));
     _accelerationController = TextEditingController(text: '${widget.car.acceleration} s');
     _topSpeedController = TextEditingController(text: '${widget.car.topSpeed} km/h');
     _gasMileageController = TextEditingController(text: '${widget.car.gasMileage} l');
-    _mileageController=TextEditingController(text: '${widget.car.gasMileage} km');
-    _vinNumberController = TextEditingController(text: '${widget.car.vinNumber}');
+    _mileageController = TextEditingController(text: '${widget.car.mileage} km');
+    _vinNumberController = TextEditingController(text: _decodeText(widget.car
+
+        .vinNumber ?? ''));
     _productionYearController = TextEditingController(text: '${widget.car.productionYear}');
-    _conditionController=TextEditingController(text:'${widget.car.condition}');
+    _conditionController = TextEditingController(text: _decodeText(widget.car.condition ?? ''));
+
+    _enginePowerControllers = [];
+    _engineFuelTypeControllers = [];
+    if (widget.car.engines != null && widget.car.engines.isNotEmpty) {
+      _enginePowerControllers = widget.car.engines
+          .map((engine) => TextEditingController(text: '${engine.power} KM'))
+          .toList();
+      _engineFuelTypeControllers = widget.car.engines
+          .map((engine) => TextEditingController(text: _decodeText(engine.fuelType)))
+          .toList();
+    } else {
+      _enginePowerControllers = [TextEditingController(text: 'Brak danych')];
+      _engineFuelTypeControllers = [TextEditingController(text: 'Brak danych')];
+    }
+    print('Initialized _enginePowerControllers length: ${_enginePowerControllers.length}');
+
+    _checkImageDimensions();
+    _checkCarAvailability(); // Check car availability on initialization
   }
 
   @override
   void dispose() {
     _priceController.dispose();
+    _nameController.dispose();
+    _colorController.dispose();
+    _modelController.dispose();
+    _bodyTypeController.dispose();
+    _driveTypeController.dispose();
+    _transmissionController.dispose();
+    _descriptionController.dispose();
+    _accelerationController.dispose();
+    _topSpeedController.dispose();
+    _gasMileageController.dispose();
+    _mileageController.dispose();
+    _vinNumberController.dispose();
+    _productionYearController.dispose();
+    _conditionController.dispose();
+    for (var controller in _enginePowerControllers) {
+      controller.dispose();
+    }
+    for (var controller in _engineFuelTypeControllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-
     return Center(
       child: Container(
         padding: EdgeInsets.only(top: 0.0),
@@ -124,24 +469,35 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                if(!_isEditing)
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => ListOfClientsAndSalesScreen(title: 'ListOfClientsAndSales')),
-                    );
-                  },
-                  child: Icon(
-                    Icons.monetization_on, // Ikona sprzedaży
-                    size: 20,
-                    color: Colors.blue,
+                if (_isEditing)
+                  GestureDetector(
+                    onTap: _isCarUnavailable ? _showUnavailableDialog : _showDeleteConfirmationDialog,
+                    child: Icon(
+                      Icons.delete,
+                      size: 20,
+                      color: Colors.blue,
+                    ),
                   ),
-                ),
+                if (!_isEditing)
+                  GestureDetector(
+                    onTap: _isCarUnavailable
+                        ? _showUnavailableDialog
+                        : () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ListOfClientsAndSalesScreen(title: 'ListOfClientsAndSales')),
+                      );
+                    },
+                    child: Icon(
+                      Icons.monetization_on,
+                      size: 20,
+                      color: Colors.blue,
+                    ),
+                  ),
                 Padding(
-                  padding: const EdgeInsets.only(right:15.0,left:15.0),
+                  padding: const EdgeInsets.only(right: 15.0, left: 15.0),
                   child: Text(
-                    _nameController.text,
+                    _decodeText(_nameController.text),
                     style: TextStyle(
                       fontSize: 20.0,
                       fontWeight: FontWeight.bold,
@@ -151,7 +507,9 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
+                  onTap: _isCarUnavailable
+                      ? _showUnavailableDialog
+                      : () {
                     if (_isEditing) {
                       updateCar();
                     }
@@ -165,59 +523,81 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                     color: Colors.blue,
                   ),
                 ),
-                 // Odstęp między ikonami
-
               ],
             ),
             Padding(
-              padding: const EdgeInsets.only(top: 20.0,bottom: 20.0,left:2.0),
+              padding: const EdgeInsets.only(top: 20.0, bottom: 20.0, left: 2.0),
               child: Row(
                 children: [
                   Align(
                     alignment: Alignment.centerLeft,
-
-
-                    child:ClipRRect(
+                    child: ClipRRect(
                       borderRadius: BorderRadius.circular(20.0),
-                      child: Image.asset(
-                        'assets/star.png',
-                        height: 170.0,
-                        width: 230.0,
+                      child: _isLoadingImage
+                          ? Container(
+                        height: 235.0,
+                        width: 200.0,
+                        color: Colors.grey[200],
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                          : Image.network(
+                        'http://192.168.68.103:8080/api/cars/${widget.car.id}/image',
+                        height: _displayHeight,
+                        width: _displayWidth,
                         fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          print('Błąd ładowania obrazka: $error');
+                          return Container(
+                            height: 235.0,
+                            width: 200.0,
+                            color: Colors.grey[200],
+                            alignment: Alignment.center,
+                            child: Text(
+                              'Błąd ładowania obrazu',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          );
+                        },
                       ),
                     ),
-
                   ),
                   SizedBox(width: 16.0),
-                  Container(
-                    alignment: Alignment.center,
-                    height: 280,
-                    width: 150,
-                    child: Column(
-                      children: [
-                        Expanded(
-                          child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: _isEditing
-                                ? TextField(
-                              controller: _descriptionController,
-                              style: TextStyle(fontSize: 12.0, color: Colors.black),
-                              maxLines: null,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                contentPadding: EdgeInsets.all(8.0),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: Container(
+                      alignment: Alignment.center,
+                      height: 280,
+                      width: 150,
+                      child: Column(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: _isEditing
+                                    ? TextField(
+                                  controller: _descriptionController,
+                                  style: TextStyle(fontSize: 12.0, color: Colors.black),
+                                  maxLines: null,
+                                  decoration: InputDecoration(
+                                    border: OutlineInputBorder(),
+                                    contentPadding: EdgeInsets.all(8.0),
+                                  ),
+                                )
+                                    : Text(
+                                  _decodeText(_descriptionController.text),
+                                  style: TextStyle(fontSize: 12.0, color: Colors.black),
+                                  textAlign: TextAlign.justify,
+                                  softWrap: true,
+                                  maxLines: null,
+                                  overflow: TextOverflow.visible,
+                                ),
                               ),
-                            )
-                                : Text(
-                              _descriptionController.text,
-                              style: TextStyle(fontSize: 12.0, color: Colors.black),
-                              textAlign: TextAlign.justify,
-                              overflow: TextOverflow.visible,
                             ),
                           ),
-                        ),
-
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -227,14 +607,14 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(right:8.0),
+                  padding: const EdgeInsets.only(right: 8.0),
                   child: Text(
-                      'PARAMETRY',
-                      style:TextStyle(
-                          fontSize: 20.0,
-                          color:Colors.black,
-                          fontWeight: FontWeight.bold
-                      )
+                    'PARAMETRY',
+                    style: TextStyle(
+                      fontSize: 20.0,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 Iconify(
@@ -245,688 +625,271 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
               ],
             ),
             Container(
-                alignment: Alignment.center,
-
-                height:300,
-                width:350,
-                child:Column(
-                    children:[
-                      Expanded(child:
-                      ListView(
-                          scrollDirection:Axis.vertical ,
-                          children:[
-                            Padding(
-                              padding: const EdgeInsets.only(top:0.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Nazwa',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _nameController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _nameController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Model',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _modelController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _modelController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Cena',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _priceController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _priceController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Rodzaj nadwozia',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _bodyTypeController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _bodyTypeController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Rodzaj napędu',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _driveTypeController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _driveTypeController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Przyspieszenie',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _accelerationController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _accelerationController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Skrzynia biegów',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _transmissionController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _transmissionController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Kolor',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _colorController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _colorController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Predkosc maksymalna',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _topSpeedController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _topSpeedController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Przebieg',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _mileageController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _mileageController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Zużycie paliwa',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _gasMileageController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _gasMileageController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Numer VIN',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _vinNumberController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _vinNumberController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Rok produkcji',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _productionYearController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _productionYearController.text,
-                                            style: TextStyle(fontSize: 15.0, fontWeight: FontWeight.bold, color: Colors.black),
-                                          ),
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top:20.0),
-                              child: Container(
-                                  width:350,
-                                  height:50,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
-                                  child:Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children:[
-                                        Padding(
-                                          padding: const EdgeInsets.only(left:15.0),
-                                          child: Text(
-                                              'Stan',
-                                              style:TextStyle(
-                                                  fontSize:15.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color:Colors.black
-                                              )
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(right: 15.0),
-                                          child: _isEditing
-                                              ? SizedBox(
-                                            width: 150,
-                                            child: TextField(
-                                              controller: _conditionController,
-                                              style: TextStyle(fontSize: 15.0),
-                                              decoration: InputDecoration(
-                                                border: InputBorder.none,
-                                                contentPadding: EdgeInsets.symmetric(vertical: 10.0),
-                                              ),
-                                            ),
-                                          )
-                                              : Text(
-                                            _conditionController.text != 'nowy' ? 'używany' : _conditionController.text,
-                                            style: TextStyle(
-                                              fontSize: 15.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
-                                            ),
-                                          )
-                                        ),
-
-                                      ]
-                                  )
-                              ),
-                            ),
-                          ]
-                      ))
-                    ]
-                )
+              alignment: Alignment.center,
+              height: 300,
+              width: 350,
+              child: Column(
+                children: [
+                  Expanded(
+                    child: ListView(
+                      scrollDirection: Axis.vertical,
+                      children: [
+                        _buildParameterRow('Nazwa', _nameController),
+                        _buildParameterRow('Model', _modelController),
+                        _buildParameterRow('Cena', _priceController),
+                        _buildParameterRow('Rodzaj nadwozia', _bodyTypeController),
+                        _buildParameterRow('Rodzaj napędu', _driveTypeController),
+                        _buildParameterRow('Przyspieszenie', _accelerationController),
+                        _buildParameterRow('Skrzynia biegów', _transmissionController),
+                        _buildParameterRow('Kolor', _colorController),
+                        _buildParameterRow('Prędkość maksymalna', _topSpeedController),
+                        _buildParameterRow('Przebieg', _mileageController),
+                        _buildParameterRow('Zużycie paliwa', _gasMileageController),
+                        _buildParameterRow('Numer VIN', _vinNumberController),
+                        _buildParameterRow('Rok produkcji', _productionYearController),
+                        _buildParameterRowWithCondition('Stan', _conditionController),
+                        if (_enginePowerControllers != null && _enginePowerControllers.isNotEmpty)
+                          _buildParameterRowForEngines(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
-
           ],
         ),
       ),
     );
   }
 
+  Widget _buildParameterRow(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: Container(
+        width: 350,
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.grey,
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 15.0),
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 15.0),
+              child: _isEditing
+                  ? SizedBox(
+                width: 150,
+                child: TextField(
+                  controller: controller,
+                  style: TextStyle(fontSize: 15.0),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                  ),
+                  maxLines: null,
+                ),
+              )
+                  : SizedBox(
+                width: 150,
+                child: Text(
+                  label == 'Prędkość maksymalna' && controller.text == '0.0 km/h' ? 'Brak danych' : _decodeText(controller.text),
+                  style: TextStyle(
+                    fontSize: label == 'Numer VIN' || label == 'Kolor' ? 12.0 : 15.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  softWrap: true,
+                  maxLines: null,
+                  overflow: TextOverflow.visible,
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParameterRowWithCondition(String label, TextEditingController controller) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: Container(
+        width: 350,
+        height: 50,
+        decoration: BoxDecoration(
+          color: Colors.grey,
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 15.0),
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 15.0),
+              child: _isEditing
+                  ? SizedBox(
+                width: 150,
+                child: TextField(
+                  controller: controller,
+                  style: TextStyle(fontSize: 15.0),
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                  ),
+                  maxLines: null,
+                ),
+              )
+                  : SizedBox(
+                width: 150,
+                child: Text(
+                  _decodeText(controller.text) != 'nowy' ? 'używany' : _decodeText(controller.text),
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                  softWrap: true,
+                  maxLines: null,
+                  overflow: TextOverflow.visible,
+                  textAlign: TextAlign.right,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildParameterRowForEngines() {
+    return Padding(
+      padding: const EdgeInsets.only(top: 20.0),
+      child: Container(
+        width: 350,
+        decoration: BoxDecoration(
+          color: Colors.grey,
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 15.0, top: 10.0),
+              child: Text(
+                'Silniki',
+                style: TextStyle(
+                  fontSize: 15.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: _enginePowerControllers.length,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Moc silnika',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          _isEditing
+                              ? SizedBox(
+                            width: 150,
+                            child: TextField(
+                              controller: _enginePowerControllers[index],
+                              style: TextStyle(fontSize: 15.0),
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(vertical: 5.0),
+                              ),
+                              maxLines: 1,
+                            ),
+                          )
+                              : SizedBox(
+                            width: 150,
+                            child: Text(
+                              _decodeText(_enginePowerControllers[index].text),
+                              style: TextStyle(
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 5.0),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Typ paliwa',
+                            style: TextStyle(
+                              fontSize: 15.0,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 150,
+                            child: Text(
+                              _decodeText(_engineFuelTypeControllers[index].text),
+                              style: TextStyle(
+                                fontSize: 15.0,
+                                fontWeight: FontWeight.bold,
+                                color: _isEditing ? Colors.grey[800] : Colors.black,
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                        ],
+                      ),
+                      if (index < _enginePowerControllers.length - 1) Divider(),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

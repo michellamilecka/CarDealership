@@ -35,7 +35,7 @@ class PriceSlider extends StatelessWidget {
         ),
         Slider(
           min: 0,
-          max: 2000000,
+          max: 1000000,
           divisions: 100,
           label: price.toStringAsFixed(0),
           onChanged: onChanged,

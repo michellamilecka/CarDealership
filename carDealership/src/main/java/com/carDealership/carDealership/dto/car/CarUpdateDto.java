@@ -69,7 +69,7 @@ public class CarUpdateDto {
         car.setProductionYear(this.productionYear);
         car.setMileage(this.mileage);
         car.setCondition(CarCondition.valueOf(this.condition));
-        car.setEngines(new ArrayList<>());
+        //car.setEngines(new ArrayList<>());
         return car;
     }
 }

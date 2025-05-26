@@ -33,16 +33,12 @@ class BodyTypeDropdown extends StatelessWidget {
           ),
           onChanged: onChanged,
           items: <String>[
-            'Limuzyna',
-            'Touring',
-            'Cabrio',
-            'Coupé',
-            'Sports Activity Coupé',
-            'Sports Activity Vehicle',
-            'Hatch',
-            'Tourer',
-            'BMW i',
-            'Gran Coupé'
+            'suv',
+            'compact',
+            'cabriolet',
+            'combi',
+            'limuzyna',
+            'coupe'
           ].map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,

@@ -88,7 +88,11 @@ public class CarService {
 
     @Transactional
     public CarReadDto updateCar(CarUpdateDto carUpdateDto) {
-        Car updatedCar = this.entityManager.merge(carUpdateDto.convertToCar());
-        return new CarReadDto(updatedCar);
+        Car existingCar = carRepository.findById(carUpdateDto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Car with ID " + carUpdateDto.getId() + " not found"));
+        Car updatedCar = carUpdateDto.convertToCar();
+        updatedCar.setEngines(existingCar.getEngines());
+        Car savedCar = carRepository.save(updatedCar);
+        return new CarReadDto(savedCar);
     }
 }
