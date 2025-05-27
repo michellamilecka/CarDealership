@@ -33,9 +33,9 @@ class FuelTypeDropdown extends StatelessWidget {
           ),
           onChanged: onChanged,
           items: <String>[
-            'Diesel',
-            'Benzyna',
-            'Plug-in'
+            'elektryczny',
+            'benzyna',
+            'diesel'
           ].map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,

@@ -1,6 +1,6 @@
 class Engine {
   final int id;
-  final double power;
+  final int power;
   final String fuelType;
 
   Engine({
@@ -12,7 +12,7 @@ class Engine {
   factory Engine.fromJson(Map<String, dynamic> json) {
     return Engine(
       id: json['id'],
-      power: json['power'].toDouble(),
+      power: json['power'],
       fuelType: json['fuelType'],
     );
   }

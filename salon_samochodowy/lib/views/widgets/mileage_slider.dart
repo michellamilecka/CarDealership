@@ -36,7 +36,7 @@ class MileageSlider extends StatelessWidget {
         ),
         Slider(
           min: 0,
-          max: 100000,
+          max: 50000,
           divisions: 100,
           label: mileage.toStringAsFixed(1),
           onChanged: onChanged,

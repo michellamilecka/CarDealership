@@ -32,7 +32,7 @@ class GearboxTypeDropdown extends StatelessWidget {
           )
           ),
           onChanged: onChanged,
-          items: <String>['Manual', 'Steptronic', '7-DKG']
+          items: <String>['7-stopniowa, automatyczna', '1-stopniowa, automatyczna', '8-stopniowa, automatyczna','6-biegowa skrzynia manualna']
               .map<DropdownMenuItem<String>>((String value) {
             return DropdownMenuItem<String>(
               value: value,

@@ -5,6 +5,8 @@ import com.carDealership.carDealership.dto.car.CarReadDto;
 import com.carDealership.carDealership.dto.car.CarUpdateDto;
 import com.carDealership.carDealership.services.CarService;
 import com.carDealership.carDealership.services.EngineService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.UrlResource;
@@ -71,7 +73,13 @@ public class CarController {
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CarReadDto> createCar(@RequestPart("car") CarCreateDto carCreateDto, @RequestPart("image") MultipartFile imageFile) {
+    public ResponseEntity<CarReadDto> createCar(
+            @RequestParam("car") String carJson,
+            @RequestPart("image") MultipartFile imageFile) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        CarCreateDto carCreateDto = mapper.readValue(carJson, CarCreateDto.class);
+
         CarReadDto carReadDto = carService.save(carCreateDto, imageFile);
         return new ResponseEntity<>(carReadDto, HttpStatus.CREATED);
     }

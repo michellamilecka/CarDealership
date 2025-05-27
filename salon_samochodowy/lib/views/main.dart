@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'BMW',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.black),
+        scaffoldBackgroundColor: Colors.white,
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'BMW'),

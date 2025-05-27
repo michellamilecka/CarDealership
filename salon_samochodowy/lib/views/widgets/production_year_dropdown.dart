@@ -25,27 +25,26 @@ class ProductionYearDropdown extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-        Container(
-          width: 200,
-          child: DropdownButton<int>(
-            value: selectedYear,
-            onChanged: (int? newYear) {
-              if (newYear != null) {
-                onChanged(newYear);
-              }
-            },
-            items: years.map<DropdownMenuItem<int>>((int year) {
-              return DropdownMenuItem<int>(
-                value: year,
-                child: Text(year.toString()),
-              );
-            }).toList(),
-            hint: Text("Wybierz rok"),
-            isExpanded: true,
-            isDense: true,
-            dropdownColor: Colors.white,
-            itemHeight: 48,
+        DropdownButton<int>(
+          isExpanded: true,
+          value: selectedYear,
+          hint: Text(
+            "Wybierz rok",
+            style: TextStyle(
+              color: Colors.grey,
+            ),
           ),
+          onChanged: (int? newYear) {
+            if (newYear != null) {
+              onChanged(newYear);
+            }
+          },
+          items: years.map<DropdownMenuItem<int>>((int year) {
+            return DropdownMenuItem<int>(
+              value: year,
+              child: Text(year.toString()),
+            );
+          }).toList(),
         ),
       ],
     );
