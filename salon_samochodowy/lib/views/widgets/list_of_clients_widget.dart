@@ -1,6 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../screens/list_of_clients_screen.dart';
-import '../models/client_mock.dart';
+import '../classes/client.dart';
 
 class ListOfClientsWidget extends StatelessWidget {
   final List<Client> filteredClients;
@@ -12,8 +14,67 @@ class ListOfClientsWidget extends StatelessWidget {
     required this.onSearch,
   });
 
+  // Decode text to handle Polish characters
+  String _decodeText(String text) {
+    if (text.isEmpty) return text;
+
+    try {
+      if (text.contains('Ä') || text.contains('Ć') || text.contains('ć') ||
+          text.contains('Å') || text.contains('Ã') || text.contains('â€')) {
+        try {
+          List<int> bytes = latin1.encode(text);
+          String decoded = utf8.decode(bytes);
+          return decoded;
+        } catch (e) {
+          return _fixPolishCharsManually(text);
+        }
+      }
+      return text;
+    } catch (e) {
+      return _fixPolishCharsManually(text);
+    }
+  }
+
+  // Manually fix Polish characters
+  String _fixPolishCharsManually(String text) {
+    return text
+        .replaceAll('Ä…', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ä‡', 'ć')
+        .replaceAll('Å‚', 'ł')
+        .replaceAll('Å„', 'ń')
+        .replaceAll('Ã³', 'ó')
+        .replaceAll('Åś', 'ś')
+        .replaceAll('Å¼', 'ź')
+        .replaceAll('Å»', 'ż')
+        .replaceAll('Ä„', 'Ą')
+        .replaceAll('Ä˜', 'Ę')
+        .replaceAll('Ä†', 'Ć')
+        .replaceAll('Å', 'Ł')
+        .replaceAll('Åƒ', 'Ń')
+        .replaceAll('Ã"', 'Ó')
+        .replaceAll('Å', 'Ś')
+        .replaceAll('Å¹', 'Ź')
+        .replaceAll('Å½', 'Ż')
+        .replaceAll('â€™', '\'')
+        .replaceAll('â€œ', '"')
+        .replaceAll('â€', '"')
+        .replaceAll('â€"', '–')
+        .replaceAll('â€"', '—')
+        .replaceAll('Äą', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ĺ‚', 'ł')
+        .replaceAll('Ĺ„', 'ń')
+        .replaceAll('Ĺś', 'ś')
+        .replaceAll('Ĺş', 'ź')
+        .replaceAll('Ĺ¼', 'ż');
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Debug print to check if data is present
+    print('Filtered Clients: ${filteredClients.length}');
+
     return Column(
       children: [
         Padding(
@@ -55,46 +116,49 @@ class ListOfClientsWidget extends StatelessWidget {
                 child: Center(
                   child: Container(
                     width: 350,
-                    height: 100,
                     decoration: BoxDecoration(
                       color: const Color(0xFFD9D9D9),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0), // Przesunięcie do środka
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Rozstawienie na boki
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start, // Wyrównanie do lewej
-                            mainAxisAlignment: MainAxisAlignment.center, // Wyśrodkowanie w pionie
-                            children: [
-                              Text(
-                                '${client.firstName} ${client.lastName}',
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  client.companyName != null
+                                      ? _decodeText(client.companyName!)
+                                      : '${_decodeText(client.firstName ?? 'N/A')} ${_decodeText(client.lastName ?? 'N/A')}',
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  overflow: TextOverflow.visible,
+                                  softWrap: true,
                                 ),
-                              ),
-                              const SizedBox(height: 5), // Odstęp między nazwiskiem a emailem
-                              Text(
-                                client.email,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.black54,
+                                const SizedBox(height: 5),
+                                SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: Text(
+                                    _decodeText(client.email),
+                                    style: const TextStyle(
+                                      fontSize: 17,
+                                      color: Colors.black54,
+                                    ),
+                                    overflow: TextOverflow.visible,
+                                    softWrap: false, // Prevent wrapping, let it scroll
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Text(
-                            client.phone,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
+                              ],
                             ),
                           ),
+
                         ],
                       ),
                     ),

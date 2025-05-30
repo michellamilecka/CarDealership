@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:image/image.dart' as img;
+import '../../config.dart';
 
 double _parseDouble(String value, double defaultValue) {
   value = value.replaceAll(RegExp(r'[^0-9,.]'), '').replaceAll(',', '.').trim();
@@ -43,7 +44,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
   // Fetch transactions to check if the car is unavailable
   Future<void> _checkCarAvailability() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.68.103:8080/api/transactions'));
+      final response = await http.get(Uri.parse('${AppConfig.baseUrl}/api/transactions'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         final unavailableCarIds = data
@@ -95,7 +96,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
 
   Future<void> _checkImageDimensions() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.68.103:8080/api/cars/${widget.car.id}/image'));
+      final response = await http.get(Uri.parse('${AppConfig.baseUrl}/api/cars/${widget.car.id}/image'));
       if (response.statusCode == 200) {
         final originalImage = img.decodeImage(response.bodyBytes);
         if (originalImage != null) {
@@ -133,7 +134,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
   Future<void> _deleteCar() async {
     try {
       final response = await http.delete(
-        Uri.parse('http://192.168.68.103:8080/api/cars/${widget.car.id}'),
+        Uri.parse('${AppConfig.baseUrl}/api/cars/${widget.car.id}'),
         headers: {
           "Accept": "application/json",
         },
@@ -225,8 +226,8 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
       return;
     }
 
-    final carUrl = Uri.parse('http://192.168.68.103:8080/api/cars');
-    final engineUrl = Uri.parse('http://192.168.68.103:8080/api/engines');
+    final carUrl = Uri.parse('${AppConfig.baseUrl}/api/cars');
+    final engineUrl = Uri.parse('${AppConfig.baseUrl}/api/engines');
 
     List<Map<String, dynamic>> updatedEngines = [];
     for (int i = 0; i < _enginePowerControllers.length; i++) {
@@ -541,7 +542,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                         child: Center(child: CircularProgressIndicator()),
                       )
                           : Image.network(
-                        'http://192.168.68.103:8080/api/cars/${widget.car.id}/image',
+                        '${AppConfig.baseUrl}/api/cars/${widget.car.id}/image',
                         height: _displayHeight,
                         width: _displayWidth,
                         fit: BoxFit.cover,

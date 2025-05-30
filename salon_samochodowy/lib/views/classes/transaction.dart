@@ -30,7 +30,7 @@ class Transaction {
       paymentMethod: json['paymentMethod'],
       registered: json['registered'],
       insured: json['insured'],
-      client: Client.fromJson(json['client']),
+      client: Client.fromIndividualJson(json['client']),
       car: Car.fromJson(json['car']),
     );
   }
