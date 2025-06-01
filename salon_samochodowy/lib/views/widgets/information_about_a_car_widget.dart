@@ -486,7 +486,7 @@ class _InformationAboutACarWidgetState extends State<InformationAboutACarWidget>
                         : () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => ListOfClientsAndSalesScreen(title: 'ListOfClientsAndSales')),
+                        MaterialPageRoute(builder: (context) => ListOfClientsAndSalesScreen(title: 'ListOfClientsAndSales',car: widget.car)),
                       );
                     },
                     child: Icon(

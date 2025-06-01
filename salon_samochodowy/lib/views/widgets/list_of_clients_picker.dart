@@ -1,20 +1,22 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '../classes/car.dart';
 import '../screens/list_of_clients_screen.dart';
 import '../screens/information_about_a_client_screen.dart';
 import '../classes/client.dart';
-
-class ListOfClientsWidget extends StatelessWidget {
+import '../screens/transaction_form_screen.dart';
+class ListOfClientsPickerWidget extends StatelessWidget {
   final List<Client> filteredClients;
   final Function(String) onSearch;
 
-  const ListOfClientsWidget({
+  const ListOfClientsPickerWidget({
     super.key,
     required this.filteredClients,
     required this.onSearch,
+    required this.car
   });
-
+final Car car;
   // Decode text to handle Polish characters
   String _decodeText(String text) {
     if (text.isEmpty) return text;
@@ -120,9 +122,10 @@ class ListOfClientsWidget extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ClientInformationScreen(
+                          builder: (context) => TransactionFormScreen(
+                            title: 'Transaction form',
+                            car: car,
                             client: client,
-                            title: 'Client Details',
                           ),
                         ),
                       );

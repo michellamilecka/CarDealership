@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../classes/car.dart';
 import '../widgets/header_widget.dart';
-import '../widgets/list_of_clients_widget.dart';
+import '../widgets/list_of_clients_picker.dart';
 import '../classes/client.dart';
 import 'client_form_screen.dart';
 import '../../config.dart';
 
 class ListOfClientsAndSalesScreen extends StatefulWidget {
-  const ListOfClientsAndSalesScreen({super.key, required this.title});
+  const ListOfClientsAndSalesScreen({super.key, required this.title,required this.car});
 
   final String title;
+  final Car car;
 
   @override
   _ListOfClientsAndSalesScreenState createState() => _ListOfClientsAndSalesScreenState();
@@ -65,10 +67,12 @@ class _ListOfClientsAndSalesScreenState extends State<ListOfClientsAndSalesScree
           .map((json) => Client.fromCorporateJson(json))
           .toList();
 
-      // Combine both lists
+      // Combine both lists and sort by id
+      final combinedClients = [...individualClients, ...corporateClients]..sort((a, b) => a.id.compareTo(b.id));
+
       setState(() {
-        clients = [...individualClients, ...corporateClients];
-        filteredClients = clients;
+        clients = combinedClients;
+        filteredClients = combinedClients;
         isLoading = false;
       });
     } catch (e) {
@@ -103,13 +107,14 @@ class _ListOfClientsAndSalesScreenState extends State<ListOfClientsAndSalesScree
           : Column(
         children: [
           Expanded(
-            child: ListOfClientsWidget(
+            child: ListOfClientsPickerWidget(
               filteredClients: filteredClients,
               onSearch: filterClients,
+              car:widget.car
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 30),
+            padding: const EdgeInsets.only(bottom: 20,top:10),
             child: Align(
               alignment: Alignment.center, // Przycisk na środku
               child: Container(
@@ -119,12 +124,14 @@ class _ListOfClientsAndSalesScreenState extends State<ListOfClientsAndSalesScree
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.add, size: 30, color: Colors.white), // Ikona "+"
-                  onPressed: () {
-                    Navigator.push(
+                  onPressed: () async {
+                    await Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => ClientFormScreen(title: 'ClientForm')),
                     );
+                    fetchClients(); // odświeżenie listy po powrocie
                   },
+
                 ),
               ),
             ),
