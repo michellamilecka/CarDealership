@@ -53,10 +53,67 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     super.dispose();
   }
 
+  // Decode text to handle Polish characters
+  String _decodeText(String text) {
+    if (text.isEmpty) return text;
+
+    try {
+      if (text.contains('Ä') || text.contains('Ć') || text.contains('ć') ||
+          text.contains('Å') || text.contains('Ã') || text.contains('â€')) {
+        try {
+          List<int> bytes = latin1.encode(text);
+          String decoded = utf8.decode(bytes);
+          return decoded;
+        } catch (e) {
+          return _fixPolishCharsManually(text);
+        }
+      }
+      return text;
+    } catch (e) {
+      return _fixPolishCharsManually(text);
+    }
+  }
+
+  // Manually fix Polish characters
+  String _fixPolishCharsManually(String text) {
+    return text
+        .replaceAll('Ä…', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ä‡', 'ć')
+        .replaceAll('Å‚', 'ł')
+        .replaceAll('Å„', 'ń')
+        .replaceAll('Ã³', 'ó')
+        .replaceAll('Åś', 'ś')
+        .replaceAll('Å¼', 'ź')
+        .replaceAll('Å»', 'ż')
+        .replaceAll('Ä„', 'Ą')
+        .replaceAll('Ä˜', 'Ę')
+        .replaceAll('Ä†', 'Ć')
+        .replaceAll('Å', 'Ł')
+        .replaceAll('Åƒ', 'Ń')
+        .replaceAll('Ã"', 'Ó')
+        .replaceAll('Å', 'Ś')
+        .replaceAll('Å¹', 'Ź')
+        .replaceAll('Å½', 'Ż')
+        .replaceAll('â€™', '\'')
+        .replaceAll('â€œ', '"')
+        .replaceAll('â€', '"')
+        .replaceAll('â€"', '–')
+        .replaceAll('â€"', '—')
+        .replaceAll('Äą', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ĺ‚', 'ł')
+        .replaceAll('Ĺ„', 'ń')
+        .replaceAll('Ĺś', 'ś')
+        .replaceAll('Ĺş', 'ź')
+        .replaceAll('Ĺ¼', 'ż');
+  }
+
   // Funkcja do formatowania polskich znaków
   String _formatPolishText(String text) {
     if (text.isEmpty) return text;
-    return text[0].toUpperCase() + text.substring(1).toLowerCase();
+    String decoded = _decodeText(text);
+    return decoded[0].toUpperCase() + decoded.substring(1).toLowerCase();
   }
 
   Future<void> _submitForm() async {
@@ -88,7 +145,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         // Pokaż dialog sukcesu
-        showDialog(
+        await showDialog(
           context: context,
           barrierDismissible: false,
           builder: (BuildContext context) {
@@ -121,20 +178,14 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                 'Dodano transakcję',
                 style: TextStyle(fontSize: 16),
               ),
-              backgroundColor: Colors.white, // Białe tło
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
-              ), // Bez obramowania
+              ),
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).pop(); // Zamknij dialog
-                    // Wróć do CarsScreen, czyszcząc stos nawigacji
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/cars', // Zakładam, że trasa do CarsScreen to '/cars'
-                          (route) => false, // Usuń wszystkie poprzednie ekrany
-                    );
                   },
                   style: TextButton.styleFrom(
                     backgroundColor: const Color(0xFF00A8E8),
@@ -155,6 +206,11 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
             );
           },
         );
+        // Wróć do ekranu głównego, a następnie przejdź do /cars
+        if (mounted) {
+          Navigator.popUntil(context, ModalRoute.withName('/')); // Wróć do ekranu głównego
+          Navigator.pushNamed(context, '/cars'); // Przejdź do CarsScreen
+        }
       } else {
         throw Exception('Nie udało się dodać transakcji: ${response.statusCode}');
       }
@@ -193,7 +249,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   Widget build(BuildContext context) {
     // Przygotuj tekst klienta do wyświetlenia
     final clientInfo = widget.client.displayName.isNotEmpty
-        ? widget.client.displayName
+        ? _decodeText(widget.client.displayName)
         : 'Brak danych klienta';
 
     return Scaffold(
@@ -214,7 +270,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Auto: ${widget.car.name}',
+                'Auto: ${_decodeText(widget.car.name)}',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
@@ -270,7 +326,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
               ),
               CheckboxListTile(
                 title: const Text(
-                  'Ubezpieczony',
+                  'Ubezpieczenie',
                   style: TextStyle(color: Colors.black),
                 ),
                 activeColor: const Color(0xFF00A8E8),
@@ -286,7 +342,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                 Padding(
                   padding: const EdgeInsets.only(bottom: 20),
                   child: Text(
-                    _errorMessage!,
+                    _decodeText(_errorMessage!),
                     style: const TextStyle(color: Colors.red, fontSize: 16),
                   ),
                 ),

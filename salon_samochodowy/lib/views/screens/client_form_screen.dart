@@ -129,6 +129,7 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
                 ],
               ),
               content: const Text('Klient został dodany pomyślnie!'),
+              backgroundColor: Colors.white, // Zmiana koloru tła na biały
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 // Usunięto obramowanie (side)
@@ -149,7 +150,6 @@ class _ClientFormScreenState extends State<ClientFormScreen> {
                 ),
               ],
             );
-
           },
         );
       } else {

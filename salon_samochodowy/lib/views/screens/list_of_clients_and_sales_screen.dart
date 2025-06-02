@@ -9,7 +9,7 @@ import 'client_form_screen.dart';
 import '../../config.dart';
 
 class ListOfClientsAndSalesScreen extends StatefulWidget {
-  const ListOfClientsAndSalesScreen({super.key, required this.title,required this.car});
+  const ListOfClientsAndSalesScreen({super.key, required this.title, required this.car});
 
   final String title;
   final Car car;
@@ -28,6 +28,61 @@ class _ListOfClientsAndSalesScreenState extends State<ListOfClientsAndSalesScree
   void initState() {
     super.initState();
     fetchClients();
+  }
+
+  // Decode text to handle Polish characters
+  String _decodeText(String text) {
+    if (text.isEmpty) return text;
+    try {
+      if (text.contains('Ä') || text.contains('Ć') || text.contains('ć') ||
+          text.contains('Å') || text.contains('Ã') || text.contains('â€')) {
+        try {
+          List<int> bytes = latin1.encode(text);
+          String decoded = utf8.decode(bytes);
+          return decoded;
+        } catch (e) {
+          return _fixPolishCharsManually(text);
+        }
+      }
+      return text;
+    } catch (e) {
+      return _fixPolishCharsManually(text);
+    }
+  }
+
+  // Manually fix Polish characters
+  String _fixPolishCharsManually(String text) {
+    return text
+        .replaceAll('Ä…', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ä‡', 'ć')
+        .replaceAll('Å‚', 'ł')
+        .replaceAll('Å„', 'ń')
+        .replaceAll('Ã³', 'ó')
+        .replaceAll('Åś', 'ś')
+        .replaceAll('Å¼', 'ź')
+        .replaceAll('Å»', 'ż')
+        .replaceAll('Ä„', 'Ą')
+        .replaceAll('Ä˜', 'Ę')
+        .replaceAll('Ä†', 'Ć')
+        .replaceAll('Å', 'Ł')
+        .replaceAll('Åƒ', 'Ń')
+        .replaceAll('Ã"', 'Ó')
+        .replaceAll('Å', 'Ś')
+        .replaceAll('Å¹', 'Ź')
+        .replaceAll('Å½', 'Ż')
+        .replaceAll('â€™', '\'')
+        .replaceAll('â€œ', '"')
+        .replaceAll('â€', '"')
+        .replaceAll('â€"', '–')
+        .replaceAll('â€"', '—')
+        .replaceAll('Äą', 'ą')
+        .replaceAll('Ä™', 'ę')
+        .replaceAll('Ĺ‚', 'ł')
+        .replaceAll('Ĺ„', 'ń')
+        .replaceAll('Ĺś', 'ś')
+        .replaceAll('Ĺş', 'ź')
+        .replaceAll('Ĺ¼', 'ż');
   }
 
   Future<void> fetchClients() async {
@@ -84,12 +139,23 @@ class _ListOfClientsAndSalesScreenState extends State<ListOfClientsAndSalesScree
   }
 
   void filterClients(String query) {
-    final results = clients.where((client) {
-      return client.lastName?.toLowerCase().contains(query.toLowerCase()) ?? false;
-    }).toList();
-
     setState(() {
-      filteredClients = results;
+      if (query.isEmpty) {
+        filteredClients = List.from(clients);
+      } else {
+        filteredClients = clients.where((client) {
+          // Dekoduj i normalizuj wszystkie pola do wyszukiwania
+          String firstName = _decodeText(client.firstName ?? '').toLowerCase();
+          String lastName = _decodeText(client.lastName ?? '').toLowerCase();
+          String companyName = _decodeText(client.companyName ?? '').toLowerCase();
+          String searchQuery = _decodeText(query).toLowerCase();
+
+          // Sprawdź, czy zapytanie pasuje do imienia, nazwiska lub nazwy firmy
+          return firstName.contains(searchQuery) ||
+              lastName.contains(searchQuery) ||
+              companyName.contains(searchQuery);
+        }).toList();
+      }
     });
   }
 
@@ -103,18 +169,18 @@ class _ListOfClientsAndSalesScreenState extends State<ListOfClientsAndSalesScree
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : errorMessage != null
-          ? Center(child: Text(errorMessage!))
+          ? Center(child: Text(_decodeText(errorMessage!)))
           : Column(
         children: [
           Expanded(
             child: ListOfClientsPickerWidget(
               filteredClients: filteredClients,
               onSearch: filterClients,
-              car:widget.car
+              car: widget.car,
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 20,top:10),
+            padding: const EdgeInsets.only(bottom: 20, top: 10),
             child: Align(
               alignment: Alignment.center, // Przycisk na środku
               child: Container(
@@ -131,7 +197,6 @@ class _ListOfClientsAndSalesScreenState extends State<ListOfClientsAndSalesScree
                     );
                     fetchClients(); // odświeżenie listy po powrocie
                   },
-
                 ),
               ),
             ),

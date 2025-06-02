@@ -95,7 +95,7 @@ class ListOfClientsWidget extends StatelessWidget {
           child: TextField(
             onChanged: onSearch,
             decoration: InputDecoration(
-              labelText: 'Wyszukaj po nazwisku',
+              labelText: 'Wyszukaj klienta',
               labelStyle: TextStyle(color: Colors.grey),
               prefixIcon: Icon(Icons.search),
               focusedBorder: OutlineInputBorder(
