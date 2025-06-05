@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
+import 'screens/cars_screen.dart'; 
 import 'widgets/footer_widget.dart';
 import 'widgets/header_widget.dart';
 
@@ -20,6 +21,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'BMW'),
+      routes: {
+        '/cars': (context) => const NewCarsScreen(title: 'New cars'), // Zdefiniuj trasę /cars
+      },
       debugShowCheckedModeBanner: false,
     );
   }
@@ -35,7 +39,6 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +53,6 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-
       bottomNavigationBar: FooterWidget(),
     );
   }

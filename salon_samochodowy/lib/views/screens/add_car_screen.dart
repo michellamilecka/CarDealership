@@ -20,6 +20,7 @@ import '../widgets/gearbox_type_dropdown.dart';
 import '../widgets/header_widget.dart';
 import '../widgets/price_slider.dart';
 import '../widgets/production_year_dropdown.dart';
+import '../../config.dart';
 
 class ChangeStateScreen extends StatefulWidget {
   const ChangeStateScreen({super.key, required String title});
@@ -78,8 +79,8 @@ class _ChangeStateScreenState extends State<ChangeStateScreen> {
 
   // Teraz sendCarData zwraca bool informujący o sukcesie
   Future<bool> sendCarData() async {
-    final engineUrl = Uri.parse('http://192.168.68.103:8080/api/engines');
-    final carUrl = Uri.parse('http://192.168.68.103:8080/api/cars');
+    final engineUrl = Uri.parse('${AppConfig.baseUrl}/api/engines');
+    final carUrl = Uri.parse('${AppConfig.baseUrl}/api/cars');
 
     List<Map<String, dynamic>> enginesData = [];
 
@@ -159,7 +160,7 @@ class _ChangeStateScreenState extends State<ChangeStateScreen> {
 
     if (carId != null) {
       for (var engineId in engineIds) {
-        final assignEngineUrl = Uri.parse('http://192.168.68.103:8080/api/cars/$carId/add-engine/$engineId');
+        final assignEngineUrl = Uri.parse('${AppConfig.baseUrl}/api/cars/$carId/add-engine/$engineId');
 
         try {
           final assignResponse = await http.put(assignEngineUrl);

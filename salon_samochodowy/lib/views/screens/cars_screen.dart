@@ -18,6 +18,7 @@ import '../classes/car.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:image/image.dart' as img;
+import '../../config.dart';
 
 class NewCarsScreen extends StatefulWidget {
   const NewCarsScreen({super.key, required String title});
@@ -100,7 +101,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
   }
 
   Future<List<Car>> fetchCars() async {
-    final response = await http.get(Uri.parse('http://192.168.68.103:8080/api/cars'));
+    final response = await http.get(Uri.parse('${AppConfig.baseUrl}/api/cars'));
     if (response.statusCode == 200) {
       List<dynamic> data = json.decode(response.body);
       List<Car> cars = data.map((carJson) => Car.fromJson(carJson)).toList();
@@ -115,7 +116,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
   // Updated method to fetch transactions based on provided JSON structure
   Future<void> fetchTransactions() async {
     try {
-      final response = await http.get(Uri.parse('http://192.168.68.103:8080/api/transactions'));
+      final response = await http.get(Uri.parse('${AppConfig.baseUrl}/api/transactions'));
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
         setState(() {
@@ -147,7 +148,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
     if (mounted) setState(() {});
 
     try {
-      final response = await http.get(Uri.parse('http://192.168.68.103:8080/api/cars/$carId/image'));
+      final response = await http.get(Uri.parse('${AppConfig.baseUrl}/api/cars/$carId/image'));
       if (response.statusCode == 200) {
         final originalImage = img.decodeImage(response.bodyBytes);
         if (originalImage != null) {
@@ -463,7 +464,7 @@ class _NewCarsScreenState extends State<NewCarsScreen> {
                                         fit: BoxFit.cover,
                                       )
                                           : Image.network(
-                                        'http://192.168.68.103:8080/api/cars/$carId/image',
+                                        '${AppConfig.baseUrl}/api/cars/$carId/image',
                                         height: displayHeight,
                                         width: displayWidth,
                                         fit: BoxFit.cover,
