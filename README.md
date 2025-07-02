@@ -32,6 +32,30 @@ Aplikacja mobilna stworzona we Flutterze, służąca do zarządzania salonem sam
 
 
 ---
+## 👥 Współtwórcy
+
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/michellamilecka">
+        <img src="https://avatars.githubusercontent.com/michellamilecka" width="80px;" alt="Jan Kowalski"/>
+        <br /><sub><b>Michella Miłecka</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/zamrokjulita">
+        <img src="https://avatars.githubusercontent.com/zamrokjulita" width="80px;" alt="Anna Nowak"/>
+        <br /><sub><b>Julita Zamroczyńska</b></sub>
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/alicjalendzioszek">
+        <img src="https://avatars.githubusercontent.com/alicjalendzioszek" width="80px;" alt="Piotr Wiśniewski"/>
+        <br /><sub><b>Alicja Lendzioszek</b></sub>
+      </a>
+    </td>
+  </tr>
+</table>
 
 ## 🚀 Jak uruchomić?
 
@@ -48,3 +72,5 @@ git clone https://github.com/twoj-login/amzss-app.git
 cd amzss-app
 flutter pub get
 flutter run
+
+
