@@ -6,13 +6,14 @@ Aplikacja mobilna stworzona we Flutterze, służąca do zarządzania salonem sam
 
 ## ✨ Kluczowe funkcje
 
-- 📦 Dodawanie transakcji sprzedaży samochodów
-- 👤 Obsługa klientów indywidualnych i firmowych
-- 🚘 Przegląd i wybór samochodów z oferty
-- 💳 Wybór metody płatności (gotówka, karta kredytowa, przelew)
-- 🧠 Walidacja formularzy i czytelne komunikaty błędów
-- 🔄 Komunikacja z backendem REST API (Spring Boot)
-- 🗂️ Przechowywanie danych i zdjęć w bazie PostgreSQL
+- Dodawanie transakcji sprzedaży samochodów
+- Obsługa klientów indywidualnych i firmowych
+- Przegląd i wybór samochodów z oferty
+- Możliwość zakupu nowego/używanego auta
+- Wybór metody płatności (gotówka, karta kredytowa, przelew)
+- Walidacja formularzy i czytelne komunikaty błędów
+- Komunikacja z backendem REST API (Spring Boot)
+- Przechowywanie danych i zdjęć w bazie PostgreSQL
 
 ---
 
