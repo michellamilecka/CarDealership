@@ -1,1 +1,49 @@
-# CarDealership
+# Aplikacja Mobilna Zarządzania Salonem Samochodowym 🚗📱
+
+Aplikacja mobilna stworzona we Flutterze, służąca do zarządzania salonem samochodowym. Projekt obejmuje zarówno frontend (Flutter), jak i backend (Spring Boot) oraz bazę danych (PostgreSQL). System wspiera rejestrowanie transakcji, zarządzanie klientami i pojazdami, oraz integruje się z zewnętrznymi źródłami danych.
+
+---
+
+## ✨ Kluczowe funkcje
+
+- 📦 Dodawanie transakcji sprzedaży samochodów
+- 👤 Obsługa klientów indywidualnych i firmowych
+- 🚘 Przegląd i wybór samochodów z oferty
+- 💳 Wybór metody płatności (gotówka, karta kredytowa, przelew)
+- 🧠 Walidacja formularzy i czytelne komunikaty błędów
+- 🔄 Komunikacja z backendem REST API (Spring Boot)
+- 🗂️ Przechowywanie danych i zdjęć w bazie PostgreSQL
+
+---
+
+## 🧰 Technologie
+
+- **Flutter** – aplikacja mobilna (frontend)
+- **Spring Boot** – backend i logika biznesowa
+- **PostgreSQL** – baza danych
+- **Scraper** – pobieranie danych z zewnętrznego źródła (BMW)
+- **Generator danych** – testowe dane dla klienta i pojazdów
+- **GitHub + Discord** – współpraca zespołu
+
+---
+
+## 📸 Przykładowe ekrany
+
+
+---
+
+## 🚀 Jak uruchomić?
+
+### Wymagania
+
+- Flutter SDK
+- Emulator lub fizyczne urządzenie mobilne
+- Backend API (np. lokalny Spring Boot)
+
+### Krok po kroku
+
+```bash
+git clone https://github.com/twoj-login/amzss-app.git
+cd amzss-app
+flutter pub get
+flutter run
